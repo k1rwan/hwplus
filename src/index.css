@@ -1,5 +1,21 @@
+@import '~antd/dist/antd.css';
 body {
   margin: 0;
   padding: 0;
   font-family: sans-serif;
+}
+
+.logo{
+  position:absolute;
+  font-size:80px;
+  left:50%;
+  top:50%;
+  margin-left:-200px;
+  margin-top:-200px;
+}
+.register{
+  position:absolute;
+  left:100%;
+  margin-left:-120px;
+  top:20px;
 }
