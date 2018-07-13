@@ -10,29 +10,31 @@ const RadioGroup = Radio.Group;
 
 var User={username:'',gender:'male',usertype:'student',password:'',wechat:'',bupt_id:'',class_number:'',email:'',phone:''};
 var vaildEmail=/^[a-zA-Z0-9_.-]+@[a-zA-Z0-9-]+(\.[a-zA-Z0-9-]+)*\.[a-zA-Z0-9]{2,6}$/;
+var validPhone=/^1\d{10}$/;
+var validPassword =/^\w{6,20}$/;
 
 class Register extends React.Component{
      constructor(props){
          super(props);
          this.state={
+             studentRequired:false,
              visible:false,
+             visible2:false,
              confirmDirty: false,
              autoCompleteResult: [],
          }
-        this.showModal=this.showModal.bind(this);
         this.handleCancel=this.handleCancel.bind(this);
         this.handleSubmit=this.handleSubmit.bind(this);
      }
     showModal = () => {
         this.setState({
-          visible: true,
+          visible: true,studentRequired:false,
         });
     }
     handleSubmit(e){
       e.preventDefault();
       this.props.form.validateFieldsAndScroll((err, values) => {
         if (!err) {
-          //console.log('Received values of form: ', values);
           User.username=values.姓名;
           User.gender=values.性别;
           User.usertype=values.身份;
@@ -42,13 +44,16 @@ class Register extends React.Component{
           User.class_number=values.班级号;
           User.phone=values.手机号;
           User.email=values.邮箱;
-          this.setState({visible: false});
+          this.setState({visible:false,visible2:true,});
         }
       });
       
     } 
     handleCancel(e){
         this.setState({visible: false});
+    }
+    handleCancel2 = () => {
+        this.setState({visible2:false});
     }
     handleConfirmBlur = (e) => {
         const value = e.target.value;
@@ -67,12 +72,22 @@ class Register extends React.Component{
         if (value && this.state.confirmDirty) {
           form.validateFields(['确认密码'], { force: true });
         }
+        if(value&&!validPassword.test(value)){
+          callback("密码格式不正确(密码必须为6-20位的字母或数字组合)");
+        }
         callback();
     }
     checkVaildEmail=(rule,value,callback)=>{
       const form=this.props.form;
       if(value&&!vaildEmail.test(value)){
         callback('您的邮箱格式不正确!');
+      }
+      callback();
+    }
+    checkVaildPhone=(rule,value,callback)=>{
+      const form=this.props.form;
+      if(value&&!validPhone.test(value)){
+        callback('您的手机号格式不正确!');
       }
       callback();
     }
@@ -84,6 +99,13 @@ class Register extends React.Component{
           autoCompleteResult = ['.com', '.org', '.net'].map(domain => `${value}${domain}`);
         }
         this.setState({ autoCompleteResult });
+    }
+    checkStudent=(e)=>{
+      if(e.target.value==="student"){
+        this.setState({studentRequired:true});
+      }else{
+        this.setState({studentRequired:false});
+      }
     }
 
      render(){
@@ -159,7 +181,7 @@ class Register extends React.Component{
               required: true, message: '请选择你的身份!',
             }],
             })(
-                <RadioGroup >
+                <RadioGroup onChange={this.checkStudent} >
                 <Radio value={"student"}>学生</Radio>
                 <Radio value={"teacher"}>老师</Radio>
                 <Radio value={"assistent"}>助教</Radio>
@@ -212,7 +234,7 @@ class Register extends React.Component{
             >
             {getFieldDecorator('学号', {
             rules: [{
-              required: false, message: '请输入你的学号!',
+              required: this.state.studentRequired, message: '请输入你的学号!',
             }],
             })(
             <Input />
@@ -224,7 +246,7 @@ class Register extends React.Component{
             >
             {getFieldDecorator('班级号', {
             rules: [{
-              required: false, message: '请输入你的班级号!',
+              required: this.state.studentRequired, message: '请输入你的班级号!',
             }],
             })(
             <Input />
@@ -237,7 +259,10 @@ class Register extends React.Component{
             {getFieldDecorator('手机号', {
             rules: [{
               required: true, message: '请输入你的手机号!',
-            }],
+            },{
+              validator: this.checkVaildPhone,
+            }
+          ],
             })(
             <Input />
             )}
@@ -261,6 +286,14 @@ class Register extends React.Component{
             <Button type="primary" htmlType="submit" className="submit">注册</Button>
             </FormItem>
             </Form>
+            </Modal>
+            <Modal
+                  title="邮箱验证"
+                  visible={this.state.visible2}
+                  footer={[<Button key="back" onClick={this.handleCancel2}>确认</Button>,]}
+                  onCancel={this.handleCancel2}
+            >
+            <p>已发送验证邮件至邮箱，请及时查看确认注册</p>
             </Modal>
              </div>
          )
