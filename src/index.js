@@ -23,15 +23,13 @@ class Register extends React.Component{
              confirmDirty: false,
              autoCompleteResult: [],
          }
-        this.handleCancel=this.handleCancel.bind(this);
-        this.handleSubmit=this.handleSubmit.bind(this);
      }
     showModal = () => {
         this.setState({
           visible: true,studentRequired:false,
         });
     }
-    handleSubmit(e){
+    handleSubmit=(e)=>{
       e.preventDefault();
       this.props.form.validateFieldsAndScroll((err, values) => {
         if (!err) {
@@ -49,7 +47,7 @@ class Register extends React.Component{
       });
       
     } 
-    handleCancel(e){
+    handleCancel=(e)=>{
         this.setState({visible: false});
     }
     handleCancel2 = () => {
@@ -304,9 +302,6 @@ const WrappedRegister = Form.create()(Register);
 
 class Topfield extends React.Component
 {   
-    constructor(props){
-        super(props);
-    }
     render()
     {
         return (
