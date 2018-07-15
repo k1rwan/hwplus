@@ -3,15 +3,23 @@ import ReactDOM from 'react-dom';
 import './index.css';
 import registerServiceWorker from './registerServiceWorker';
 import {Modal,Button,Input,Tag,Form,Tooltip,Icon,Cascader,Select,Row,Col,Checkbox,AutoComplete,Radio}from'antd'
+import axios from 'axios';
 const FormItem = Form.Item;
 const Option = Select.Option;
 const AutoCompleteOption = AutoComplete.Option;
 const RadioGroup = Radio.Group;
 
-var User={username:'',gender:'male',usertype:'student',password:'',wechat:'',bupt_id:'',class_number:'',email:'',phone:''};
+var User={name:'',username:'',gender:'male',usertype:'student',password:'',wechat:'',bupt_id:'',class_number:'',email:'',phone:''};
 var vaildEmail=/^[a-zA-Z0-9_.-]+@[a-zA-Z0-9-]+(\.[a-zA-Z0-9-]+)*\.[a-zA-Z0-9]{2,6}$/;
 var validPhone=/^1\d{10}$/;
 var validPassword =/^\w{6,20}$/;
+var postUser=axios.create({
+  url:"http://108.160.130.164:8082/data/users/",
+  headers:{"content-type":"application/json"},
+  method:'post',
+  data:User,
+  timeout:1000,
+});
 
 class Register extends React.Component{
      constructor(props){
@@ -33,7 +41,8 @@ class Register extends React.Component{
       e.preventDefault();
       this.props.form.validateFieldsAndScroll((err, values) => {
         if (!err) {
-          User.username=values.姓名;
+          User["name"]=values.真实姓名;
+          User.username=values.用户名;
           User.gender=values.性别;
           User.usertype=values.身份;
           User.password=values.密码;
@@ -42,12 +51,19 @@ class Register extends React.Component{
           User.class_number=values.班级号;
           User.phone=values.手机号;
           User.email=values.邮箱;
+          console.log(User);
+          postUser().then(function(response){
+            console.log(response);
+          })
+          .catch(function(error){
+            console.log(error);
+          });
           this.setState({visible:false,visible2:true,});
         }
       });
       
     } 
-    handleCancel=(e)=>{
+    handleCancel=()=>{
         this.setState({visible: false});
     }
     handleCancel2 = () => {
@@ -107,7 +123,7 @@ class Register extends React.Component{
     }
 
      render(){
-         console.log(User);
+         //console.log(User);
          const { getFieldDecorator } = this.props.form;
          const { autoCompleteResult } = this.state;
          const formItemLayout = {
@@ -145,11 +161,23 @@ class Register extends React.Component{
             <Form onSubmit={this.handleSubmit}>
             <FormItem
              {...formItemLayout}
-             label="姓名"
+             label="真实姓名"
             >
-            {getFieldDecorator('姓名', {
+            {getFieldDecorator('真实姓名', {
             rules: [{
               required: true, message: '请输入你的名字!',
+            }],
+            })(
+            <Input />
+            )}
+            </FormItem>
+            <FormItem
+             {...formItemLayout}
+             label="用户名"
+            >
+            {getFieldDecorator('用户名', {
+            rules: [{
+              required: true, message: '请输入你的用户名!',
             }],
             })(
             <Input />
