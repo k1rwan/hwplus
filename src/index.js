@@ -6,7 +6,6 @@ import {Modal,Button,Input,Tag,Form,Tooltip,Icon,Cascader,Select,Row,Col,Checkbo
 import axios from 'axios';
 const FormItem = Form.Item;
 const Option = Select.Option;
-const AutoCompleteOption = AutoComplete.Option;
 const RadioGroup = Radio.Group;
 
 var User={name:'',username:'',gender:'male',usertype:'student',password:'',wechat:'',bupt_id:'',class_number:'',email:'',phone:''};
@@ -20,6 +19,28 @@ var postUser=axios.create({
   data:User,
   timeout:1000,
 });
+
+class Login extends React.Component{
+  constructor(props){
+    super(props);
+    this.state={
+      studentEntry:false,
+      teacherEntry:false,
+      assistantEntry:false,
+    }
+  }
+
+
+  render(){
+    return(
+      <div>
+      <Button  className="studententry" onClick={this.showModal} size="large" >学生入口</Button>
+      <Button  className="teacherentry" onClick={this.showModal} size="large" >教师入口</Button>
+      <Button  className="assistantentry" onClick={this.showModal} size="large" >助教入口</Button>
+      </div>
+    )
+  }
+}
 
 class Register extends React.Component{
      constructor(props){
@@ -40,6 +61,7 @@ class Register extends React.Component{
     handleSubmit=(e)=>{
       e.preventDefault();
       this.props.form.validateFieldsAndScroll((err, values) => {
+        console.log(err);
         if (!err) {
           User["name"]=values.真实姓名;
           User.username=values.用户名;
@@ -51,7 +73,7 @@ class Register extends React.Component{
           User.class_number=values.班级号;
           User.phone=values.手机号;
           User.email=values.邮箱;
-          console.log(User);
+          //console.log(User);
           postUser().then(function(response){
             console.log(response);
           })
@@ -105,25 +127,25 @@ class Register extends React.Component{
       }
       callback();
     }
-    handleWebsiteChange = (value) => {
-        let autoCompleteResult;
-        if (!value) {
-          autoCompleteResult = [];
-        } else {
-          autoCompleteResult = ['.com', '.org', '.net'].map(domain => `${value}${domain}`);
-        }
-        this.setState({ autoCompleteResult });
-    }
     checkStudent=(e)=>{
       if(e.target.value==="student"){
-        this.setState({studentRequired:true});
+        this.setState({
+          studentRequired:true
+        },()=>{
+          this.props.form.validateFields(['学号'], { force: true });
+          this.props.form.validateFields(['班级号'], { force: true });
+        });
       }else{
-        this.setState({studentRequired:false});
+        this.setState({
+          studentRequired:false
+        },()=>{
+          this.props.form.validateFields(['学号'], { force: true });
+          this.props.form.validateFields(['班级号'], { force: true });
+        });
       }
     }
 
      render(){
-         //console.log(User);
          const { getFieldDecorator } = this.props.form;
          const { autoCompleteResult } = this.state;
          const formItemLayout = {
@@ -210,7 +232,7 @@ class Register extends React.Component{
                 <RadioGroup onChange={this.checkStudent} >
                 <Radio value={"student"}>学生</Radio>
                 <Radio value={"teacher"}>老师</Radio>
-                <Radio value={"assistent"}>助教</Radio>
+                <Radio value={"assistant"}>助教</Radio>
                 </RadioGroup>
             )}
             </FormItem>
@@ -327,6 +349,7 @@ class Register extends React.Component{
 }
 
 const WrappedRegister = Form.create()(Register);
+const WrappedLogin=Form.create()(Login);
 
 class Topfield extends React.Component
 {   
@@ -335,6 +358,7 @@ class Topfield extends React.Component
         return (
             <div>
             <WrappedRegister/>
+            <WrappedLogin/>
             <div className="logo">
                 Homework+
             </div>
