@@ -24,19 +24,81 @@ class Login extends React.Component{
   constructor(props){
     super(props);
     this.state={
-      studentEntry:false,
-      teacherEntry:false,
-      assistantEntry:false,
+      entry:false,
+      loginTitle:"学生登录",
     }
   }
 
+  showModal=(e)=>{
+    if(e.target.innerText==="学生入口"){
+      this.setState({loginTitle:"学生登录"});
+    }else if(e.target.innerText==="教师入口"){
+      this.setState({loginTitle:"教师登录"});
+    }else if(e.target.innerText==="助教入口"){
+      this.setState({loginTitle:"助教登录"});
+    }
+    this.setState({entry:true});
+  }
+
+  handleCancel=()=>{
+    this.setState({entry:false});
+  }
 
   render(){
+    const { getFieldDecorator } = this.props.form;
+    const { autoCompleteResult } = this.state;
+    const formItemLayout = {
+      labelCol: {
+        xs: { span: 24 },
+        sm: { span: 8 },
+      },
+      wrapperCol: {
+        xs: { span: 24 },
+        sm: { span: 16 },
+      },
+    };
+    const tailFormItemLayout = {
+      wrapperCol: {
+        xs: {
+          span: 24,
+          offset: 0,
+        },
+        sm: {
+          span: 16,
+          offset: 8,
+        },
+      },
+    };
     return(
       <div>
+      <br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/>
+      <Row>
+      <Col xs={24} sm={{span:8,offset:8}}>
+      <div className="logo">
+                Homework+
+      </div>
+      </Col>
+      </Row>
+      <br/><br/><br/><br/><br/>
+      <Row>
+      <Col xs={24} sm={8}>
       <Button  className="studententry" onClick={this.showModal} size="large" >学生入口</Button>
+      </Col>
+      <Col xs={24} sm={8}>
       <Button  className="teacherentry" onClick={this.showModal} size="large" >教师入口</Button>
+      </Col>
+      <Col xs={24} sm={8}>
       <Button  className="assistantentry" onClick={this.showModal} size="large" >助教入口</Button>
+      </Col>
+      </Row>
+      <Modal
+                    title={this.state.loginTitle}
+                    visible={this.state.entry}
+                    footer={null}
+                    onCancel={this.handleCancel}
+                    destroyOnClose={true}
+            >
+      </Modal>
       </div>
     )
   }
@@ -61,7 +123,6 @@ class Register extends React.Component{
     handleSubmit=(e)=>{
       e.preventDefault();
       this.props.form.validateFieldsAndScroll((err, values) => {
-        console.log(err);
         if (!err) {
           User["name"]=values.真实姓名;
           User.username=values.用户名;
@@ -359,9 +420,6 @@ class Topfield extends React.Component
             <div>
             <WrappedRegister/>
             <WrappedLogin/>
-            <div className="logo">
-                Homework+
-            </div>
             </div>
         );
         

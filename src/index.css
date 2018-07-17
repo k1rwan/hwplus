@@ -6,10 +6,7 @@ body {
 }
 
 .logo{
-  position:absolute;
   font-size:80px;
-  left:34%;
-  top:31%;
 }
 .register{
   position:absolute;
@@ -24,9 +21,7 @@ body {
 }
 
 .studententry{
-  position:absolute;
-  left:25%;
-  top:59%;
+  left:33%;
   height:50px;
   width:150px;
   font-size:25px;
@@ -34,9 +29,7 @@ body {
 }
 
 .teacherentry{
-  position:absolute;
-  left:44%;
-  top:59%;
+  left:33%;
   height:50px;
   width:150px;
   font-size:25px;
@@ -44,9 +37,7 @@ body {
 }
 
 .assistantentry{
-  position:absolute;
-  left:63%;
-  top:59%;
+  left:33%;
   height:50px;
   width:150px;
   font-size:25px;
