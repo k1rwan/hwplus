@@ -8,17 +8,26 @@ const FormItem = Form.Item;
 const Option = Select.Option;
 const RadioGroup = Radio.Group;
 
-var User={name:'',username:'',gender:'male',usertype:'student',password:'',wechat:'',bupt_id:'',class_number:'',email:'',phone:''};
+var User={name:'',username:'',gender:'',usertype:'',password:'',wechat:'',bupt_id:'',class_number:'',email:'',phone:''};
+var Userlogin={type:'',content:''};
 var vaildEmail=/^[a-zA-Z0-9_.-]+@[a-zA-Z0-9-]+(\.[a-zA-Z0-9-]+)*\.[a-zA-Z0-9]{2,6}$/;
 var validPhone=/^1\d{10}$/;
 var validPassword =/^\w{6,20}$/;
 var postUser=axios.create({
-  url:"http://108.160.130.164:8082/data/users/",
+  url:"http://106.14.148.208:8088/data/users/",
   headers:{"content-type":"application/json"},
   method:'post',
   data:User,
   timeout:1000,
 });
+
+var loginUser=axios.create({
+  url:"http://106.14.148.208:8088/data/is_repeated/",
+  headers:{"content-type":"application/json"},
+  method:'post',
+  data:Userlogin,
+  timeout:1000,
+})
 
 class Login extends React.Component{
   constructor(props){
@@ -42,6 +51,10 @@ class Login extends React.Component{
 
   handleCancel=()=>{
     this.setState({entry:false});
+  }
+
+  handleSubmit=()=>{
+
   }
 
   render(){
@@ -98,6 +111,31 @@ class Login extends React.Component{
                     onCancel={this.handleCancel}
                     destroyOnClose={true}
             >
+      <Form onSubmit={this.handleSubmit}>
+      <FormItem
+      {...formItemLayout}
+      label="用户名"
+      >
+      {getFieldDecorator('用户名', {
+      rules: [{required: true, message: '请输入用户名!'}],
+      })(
+        <Input />
+      )}
+      </FormItem>
+      <FormItem
+      {...formItemLayout}
+      label="密码"
+      >
+      {getFieldDecorator('密码', {
+      rules: [{required: true, message: '请输入密码!'}],
+      })(
+        <Input />
+      )}
+      </FormItem>
+      <FormItem {...tailFormItemLayout}>
+        <Button type="primary" htmlType="submit" className="submit" >确认</Button>
+      </FormItem>
+      </Form>
       </Modal>
       </div>
     )
@@ -132,13 +170,14 @@ class Register extends React.Component{
           User.wechat=values.微信号;
           User.bupt_id=values.学号;
           User.class_number=values.班级号;
+          if(User.usertype==="teacher"||User.usertype==="assistant"){
+            delete User.bupt_id;
+            delete User.class_number;
+          }
           User.phone=values.手机号;
           User.email=values.邮箱;
           //console.log(User);
-          postUser().then(function(response){
-            console.log(response);
-          })
-          .catch(function(error){
+          postUser().catch(function(error){
             console.log(error);
           });
           this.setState({visible:false,visible2:true,});
@@ -155,6 +194,21 @@ class Register extends React.Component{
     handleConfirmBlur = (e) => {
         const value = e.target.value;
         this.setState({ confirmDirty: this.state.confirmDirty || !!value });
+    }
+    validateUsername=(rule,value,callback)=>{
+      const form=this.props.form;
+      Userlogin.type="username";
+      Userlogin.content=form.getFieldValue('用户名');
+      loginUser().then(function(response){
+        if(value&&response.data.data.repeat){
+          callback('您的用户名是重复的!');
+        }else{
+          callback();
+        }
+      })
+      .catch(function(error){
+        console.log(error);
+      });
     }
     compareToFirstPassword = (rule, value, callback) => {
         const form = this.props.form;
@@ -261,6 +315,8 @@ class Register extends React.Component{
             {getFieldDecorator('用户名', {
             rules: [{
               required: true, message: '请输入你的用户名!',
+            }, {
+              validator: this.validateUsername,
             }],
             })(
             <Input />
