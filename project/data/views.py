@@ -219,10 +219,11 @@ def user_detail(request, pk):
             return Response(data=data, headers=headers)
 
 @api_view(['POST'])
-def get_all(request):
+def is_repeated(request):
+    to_judge=request.data['content']
     all_data=User.objects.values_list(request.data['type']).all()
     all_data=[item[0] for item in all_data]
-    data['data']=all_data
+    data['data']={"repeat":(to_judge in all_data)}
     return Response(data=data,headers=headers)
 
 class HWFCourseClassViewSet(viewsets.ModelViewSet):
