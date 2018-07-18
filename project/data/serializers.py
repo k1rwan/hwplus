@@ -25,8 +25,8 @@ class UserSerializer(serializers.ModelSerializer):
             class_number=vd['class_number']
             user=User.objects.create(usertype=usertype,gender=gender,username=username,email=email,bupt_id=bupt_id,phone=phone,class_number=class_number,name=name,wechat=wechat,is_active=False)
         except KeyError:
-            pass
-        user=User.objects.create(usertype=usertype,gender=gender,username=username,email=email,phone=phone,class_number="000",name=name,wechat=wechat,is_active=False)
+            user=User.objects.create(usertype=usertype,gender=gender,username=username,email=email,phone=phone,class_number="000",name=name,wechat=wechat,is_active=False)
+            
         user.set_password(password)
         user.save()
         return user
