@@ -16,5 +16,6 @@ urlpatterns=[
     url(r'^data/users/$',views.user_list),
     url(r'^data/users/(?P<pk>[0-9]+)/$',views.user_detail),
     url(r'^login/$',views.login),
-    url(r'^data/is_repeated/$',views.is_repeated)
+    url(r'^data/is_repeated/$',views.is_repeated),
+    url(r'^account/activate/$',views.activate)
 ]

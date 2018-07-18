@@ -37,6 +37,10 @@ results={
     'REQ_ERR':{
         'code':4040,
         'msg':'参数错误'
+    },
+    'PWD_ERR':{
+        'code':5000,
+        'msg':'用户名或密码错误'
     }
 }
 data = {
@@ -224,6 +228,17 @@ def is_repeated(request):
     all_data=User.objects.values_list(request.data['type']).all()
     all_data=[item[0] for item in all_data]
     data['data']={"repeat":(to_judge in all_data)}
+    return Response(data=data,headers=headers)
+
+# 激活账户
+@api_view(['POST'])
+def activate(request):
+    global data,headers,token
+    usrn=token.confirm_validate_token(request.META['HTTP_TOKEN'])
+    if usrn:
+        user_obj=User.objects.get(username=usrn)
+        user_obj.is_active=True
+        user_obj.save()
     return Response(data=data,headers=headers)
 
 class HWFCourseClassViewSet(viewsets.ModelViewSet):
