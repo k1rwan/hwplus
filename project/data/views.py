@@ -6,6 +6,7 @@ from data import serializers
 from data import permissions
 from project.settings import API_AUTH_KEY, SECRET_KEY
 from data.confirm import Token
+from data.confirm import send
 from rest_framework.response import Response
 from rest_framework.decorators import api_view
 from rest_framework import status
@@ -148,11 +149,9 @@ def user_list(request):
         if serializer.is_valid():
             serializer.save()
             data['result'] = results['SUCCESS']
+            send(User.objects.get(email=request.data['email']))
             return Response(serializer.data, status=status.HTTP_201_CREATED)
-        data['result'] = {
-            'code':5000,
-            'msg':str(serializer.errors)
-        }
+        
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
