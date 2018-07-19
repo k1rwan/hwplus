@@ -2,8 +2,9 @@ import React from 'react';
 import ReactDOM from 'react-dom';
 import './index.css';
 import registerServiceWorker from './registerServiceWorker';
-import {Modal,Button,Input,Tag,Form,Tooltip,Icon,Cascader,Select,Row,Col,Checkbox,AutoComplete,Radio}from'antd'
+import {Modal,Button,Input,Tag,Form,Tooltip,Icon,Cascader,Select,Row,Col,Checkbox,AutoComplete,Radio}from'antd';
 import axios from 'axios';
+import {Route,Switch,Link,HashRouter,BrowserRouter} from 'react-router-dom';
 const FormItem = Form.Item;
 const Option = Select.Option;
 const RadioGroup = Radio.Group;
@@ -268,6 +269,8 @@ class Register extends React.Component{
       const form=this.props.form;
       Userlogin.type="bupt_id";
       Userlogin.content=form.getFieldValue('学号');
+      console.log(Userlogin.content)
+      if(Userlogin.content!==undefined){
       loginUser().then(function(response){
         if(value&&response.data.data.repeat){
           callback('该学号已被注册!');
@@ -278,6 +281,10 @@ class Register extends React.Component{
       .catch(function(error){
         console.log(error);
       });
+    }
+     if(Userlogin.content===undefined){
+     callback();
+     }
     }
     checkVaildWechat=(rule,value,callback)=>{
       const form=this.props.form;
