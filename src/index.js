@@ -201,7 +201,7 @@ class Register extends React.Component{
       Userlogin.content=form.getFieldValue('用户名');
       loginUser().then(function(response){
         if(value&&response.data.data.repeat){
-          callback('您的用户名是重复的!');
+          callback('该用户名已被注册!');
         }else{
           callback();
         }
@@ -230,17 +230,69 @@ class Register extends React.Component{
     }
     checkVaildEmail=(rule,value,callback)=>{
       const form=this.props.form;
+      Userlogin.type="email";
+      Userlogin.content=form.getFieldValue('邮箱');
       if(value&&!vaildEmail.test(value)){
         callback('您的邮箱格式不正确!');
       }
-      callback();
+      loginUser().then(function(response){
+        if(value&&response.data.data.repeat){
+          callback('该邮箱已被注册!');
+        }else{
+          callback();
+        }
+      })      
+      .catch(function(error){
+        console.log(error);
+      });
     }
     checkVaildPhone=(rule,value,callback)=>{
       const form=this.props.form;
+      Userlogin.type="phone";
+      Userlogin.content=form.getFieldValue('手机号');
       if(value&&!validPhone.test(value)){
         callback('您的手机号格式不正确!');
       }
-      callback();
+      loginUser().then(function(response){
+        if(value&&response.data.data.repeat){
+          callback('该手机号已被注册!');
+        }else{
+          callback();
+        }
+      })      
+      .catch(function(error){
+        console.log(error);
+      });
+    }
+    checkVaildbuptid=(rule,value,callback)=>{
+      const form=this.props.form;
+      Userlogin.type="bupt_id";
+      Userlogin.content=form.getFieldValue('学号');
+      loginUser().then(function(response){
+        if(value&&response.data.data.repeat){
+          callback('该学号已被注册!');
+        }else{
+          callback();
+        }
+      })      
+      .catch(function(error){
+        console.log(error);
+      });
+    }
+    checkVaildWechat=(rule,value,callback)=>{
+      const form=this.props.form;
+      Userlogin.type="wechat";
+      Userlogin.content=form.getFieldValue('微信号');
+      loginUser().then(function(response){
+        if(value&&response.data.data.repeat){
+          callback('该微信号已被注册!');
+        }else{
+          callback();
+        }
+      })      
+      .catch(function(error){
+        console.log(error);
+      });
     }
     checkStudent=(e)=>{
       if(e.target.value==="student"){
@@ -302,7 +354,7 @@ class Register extends React.Component{
             >
             {getFieldDecorator('真实姓名', {
             rules: [{
-              required: true, message: '请输入你的名字!',
+              required: true, message: '请输入你的名字!',whitespace:true
             }],
             })(
             <Input />
@@ -314,7 +366,7 @@ class Register extends React.Component{
             >
             {getFieldDecorator('用户名', {
             rules: [{
-              required: true, message: '请输入你的用户名!',
+              required: true, message: '请输入你的用户名!',whitespace:true
             }, {
               validator: this.validateUsername,
             }],
@@ -359,7 +411,7 @@ class Register extends React.Component{
             >
             {getFieldDecorator('密码', {
              rules: [{
-              required: true, message: '请输入你的密码!',
+              required: true, message: '请输入你的密码!',whitespace:true
             }, {
               validator: this.validateToNextPassword,
             }],
@@ -373,7 +425,7 @@ class Register extends React.Component{
             >
             {getFieldDecorator('确认密码', {
             rules: [{
-              required: true, message: '请确认你的密码!',
+              required: true, message: '请确认你的密码!',whitespace:true
             }, {
               validator: this.compareToFirstPassword,
             }],
@@ -387,7 +439,9 @@ class Register extends React.Component{
             >
             {getFieldDecorator('微信号', {
             rules: [{
-              required: true, message: '请输入你的微信号!',
+              required: true, message: '请输入你的微信号!',whitespace:true
+            }, {
+              validator: this.checkVaildWechat,
             }],
             })(
             <Input />
@@ -399,7 +453,9 @@ class Register extends React.Component{
             >
             {getFieldDecorator('学号', {
             rules: [{
-              required: this.state.studentRequired, message: '请输入你的学号!',
+              required: this.state.studentRequired, message: '请输入你的学号!',whitespace:true
+            }, {
+              validator: this.checkVaildbuptid,
             }],
             })(
             <Input />
@@ -411,7 +467,7 @@ class Register extends React.Component{
             >
             {getFieldDecorator('班级号', {
             rules: [{
-              required: this.state.studentRequired, message: '请输入你的班级号!',
+              required: this.state.studentRequired, message: '请输入你的班级号!',whitespace:true
             }],
             })(
             <Input />
@@ -423,7 +479,7 @@ class Register extends React.Component{
             >
             {getFieldDecorator('手机号', {
             rules: [{
-              required: true, message: '请输入你的手机号!',
+              required: true, message: '请输入你的手机号!',whitespace:true
             },{
               validator: this.checkVaildPhone,
             }
@@ -438,7 +494,7 @@ class Register extends React.Component{
             >
             {getFieldDecorator('邮箱', {
             rules: [{
-              required: true, message: '请输入邮箱地址!',
+              required: true, message: '请输入邮箱地址!',whitespace:true
             },{
               validator: this.checkVaildEmail,
             }
