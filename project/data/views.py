@@ -70,7 +70,8 @@ def login(request):
     try:
         from_username = request.data['username']
         from_password = request.data['password']
-    except:
+    except Exception as e:
+        print(e)
         data['result'] = results['REQ_ERR']
         return Response(data=data,headers=headers)
     try:
@@ -99,6 +100,7 @@ def login(request):
     else:
         data['result'] = results['PWD_ERR']
         return Response(data=data,headers=headers)
+    
     data['result']=results['REQ_ERR']
     return Response(data=data,headers=headers)
 

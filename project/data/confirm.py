@@ -5,7 +5,7 @@ from project.settings import SECRET_KEY
 import project.settings as settings
 from django.core.mail import send_mail
 
-DOMAIN="localhost:8000"
+DOMAIN="localhost:3000"
 
 class Token():
     def __init__(self, security_key):
@@ -24,10 +24,6 @@ def send(user):
     token=token_confirm.generate_validate_token(user.username)
     message="\n".join(['%s,Welcome to Homework+'%user.username,
     'Visit the following link to activate your account',
-    "http://"+'/'.join([DOMAIN,'account/activate',token])
+    "http://"+'/'.join([DOMAIN,'emailcheck','?token='+str(token)])
     ])
     send_mail('HomeworkPlus',message,'liadrinz@163.com',[user.email])
-    
-
-    
-    
