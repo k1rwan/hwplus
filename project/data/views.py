@@ -43,21 +43,28 @@ results={
         'msg':'用户名或密码错误'
     }
 }
-data = {
-    'result': {
-        'code':None,
-        'msg':None
-    },
-    'data': None
-}
-headers = {
-    'token': None
-}
+
+data = None
+headers = None
+
+def init():
+    global data,headers
+    data = {
+        'result': {
+            'code':None,
+            'msg':None
+        },
+        'data': None
+    }
+    headers = {
+        'token': None
+    }
 
 # 登录接口
 
 @api_view(['POST', 'HEAD'])
 def login(request):
+    init()
     global token,data,headers
     try:
         from_username = request.data['username']
@@ -89,7 +96,7 @@ def login(request):
         data['result'] = results['SUCCESS']
         return Response(data=data, headers=headers)
     else:
-        data['result'] = results['FORBIDDEN']
+        data['result'] = results['PWD_ERR']
         return Response(data=data,headers=headers)
     data['result']=results['REQ_ERR']
     return Response(data=data,headers=headers)
@@ -97,6 +104,7 @@ def login(request):
 
 @api_view(['GET', 'POST'])
 def user_list(request):
+    init()
     global token,data,headers
     # 用户列表接口
     if request.method == 'GET':
@@ -150,6 +158,7 @@ def user_list(request):
 
 @api_view(['GET', 'PUT'])
 def user_detail(request, pk):
+    init()
     global token,data,headers
     try:
         user = User.objects.get(pk=pk)
@@ -224,6 +233,7 @@ def user_detail(request, pk):
 
 @api_view(['POST'])
 def is_repeated(request):
+    init()
     to_judge=request.data['content']
     all_data=User.objects.values_list(request.data['type']).all()
     all_data=[item[0] for item in all_data]
@@ -233,6 +243,7 @@ def is_repeated(request):
 # 激活账户
 @api_view(['POST'])
 def activate(request):
+    init()
     global data,headers,token
     usrn=token.confirm_validate_token(request.META['HTTP_TOKEN'])
     if usrn:
