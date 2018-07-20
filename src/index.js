@@ -77,8 +77,6 @@ class Login extends React.Component{
     takeToken().then(function(response){
       localStorage.setItem("token",response.headers.token);
       localStorage.setItem("type",response.data.data.usertype);
-      console.log(localStorage.getItem("token"));
-      console.log(localStorage.getItem("type"));
       if(localStorage.getItem("type")==='student'&&that.state.loginTitle==="学生登录"){
         checkLogin=1;
         loginhref="/studentcenter";
@@ -101,7 +99,6 @@ class Login extends React.Component{
 }
 
   render(){
-    //console.log(this.props);
     const { getFieldDecorator } = this.props.form;
     const { autoCompleteResult } = this.state;
     const formItemLayout = {
@@ -223,7 +220,6 @@ class Register extends React.Component{
           }
           User.phone=values.手机号;
           User.email=values.邮箱;
-          //console.log(User);
           postUser().catch(function(error){
             console.log(error);
           });
