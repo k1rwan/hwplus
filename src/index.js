@@ -4,18 +4,21 @@ import './index.css';
 import registerServiceWorker from './registerServiceWorker';
 import {Modal,Button,Input,Tag,Form,Tooltip,Icon,Cascader,Select,Row,Col,Checkbox,AutoComplete,Radio}from'antd';
 import axios from 'axios';
-import {Route,Switch,Link,HashRouter,BrowserRouter} from 'react-router-dom';
+import {Route,Switch,Link,HashRouter,BrowserRouter,Redirect} from 'react-router-dom';
 const FormItem = Form.Item;
 const Option = Select.Option;
 const RadioGroup = Radio.Group;
 
 var User={name:'',username:'',gender:'',usertype:'',password:'',wechat:'',bupt_id:'',class_number:'',email:'',phone:''};
 var Userlogin={type:'',content:''};
+var Userlogin2={username:'',password:''};
+var loginhref='';
+var checkLogin=0;//判断是否在正确的入口登录
 var vaildEmail=/^[a-zA-Z0-9_.-]+@[a-zA-Z0-9-]+(\.[a-zA-Z0-9-]+)*\.[a-zA-Z0-9]{2,6}$/;
 var validPhone=/^1\d{10}$/;
 var validPassword =/^\w{6,20}$/;
 var postUser=axios.create({
-  url:"http://106.14.148.208:8088/data/users/",
+  url:"http://106.14.148.208:8080/data/users/",
   headers:{"content-type":"application/json"},
   method:'post',
   data:User,
@@ -23,10 +26,18 @@ var postUser=axios.create({
 });
 
 var loginUser=axios.create({
-  url:"http://106.14.148.208:8088/data/is_repeated/",
+  url:"http://106.14.148.208:8080/data/is_repeated/",
   headers:{"content-type":"application/json"},
   method:'post',
   data:Userlogin,
+  timeout:1000,
+})
+
+var takeToken=axios.create({
+  url:"http://106.14.148.208:8080/login/",
+  headers:{"content-type":"application/json"},
+  method:'post',
+  data:Userlogin2,
   timeout:1000,
 })
 
@@ -35,6 +46,7 @@ class Login extends React.Component{
     super(props);
     this.state={
       entry:false,
+      redirect:false,
       loginTitle:"学生登录",
     }
   }
@@ -47,18 +59,49 @@ class Login extends React.Component{
     }else if(e.target.innerText==="助教入口"){
       this.setState({loginTitle:"助教登录"});
     }
-    this.setState({entry:true});
+    this.setState({entry:true,redirect:false});
   }
 
   handleCancel=()=>{
-    this.setState({entry:false});
+    this.setState({entry:false,redirect:false});
   }
 
-  handleSubmit=()=>{
-
+  handleSubmit=(e)=>{
+    checkLogin=0;
+    e.preventDefault();
+    this.props.form.validateFieldsAndScroll((err, values) => {
+    if(!err){
+    Userlogin2.username=values.用户名;
+    Userlogin2.password=values.密码;
+    var that=this;
+    takeToken().then(function(response){
+      localStorage.setItem("token",response.headers.token);
+      localStorage.setItem("type",response.data.data.usertype);
+      console.log(localStorage.getItem("token"));
+      console.log(localStorage.getItem("type"));
+      if(localStorage.getItem("type")==='student'&&that.state.loginTitle==="学生登录"){
+        checkLogin=1;
+        loginhref="/studentcenter";
+      }else if (localStorage.getItem("type")==='teacher'&&that.state.loginTitle==="教师登录"){
+        checkLogin=1;
+        loginhref="/teachercenter";
+      }else if(localStorage.getItem("type")==='assistant'&&that.state.loginTitle==="助教登录"){
+        checkLogin=1;
+        loginhref="/assistantcenter";
+      }
+      if(!(localStorage.getItem("token")==="None")){
+      that.setState({entry:false,redirect:true});
+      }
+    })
+    .catch(function(error){
+      console.log(error);
+    });
   }
+  });
+}
 
   render(){
+    //console.log(this.props);
     const { getFieldDecorator } = this.props.form;
     const { autoCompleteResult } = this.state;
     const formItemLayout = {
@@ -83,6 +126,9 @@ class Login extends React.Component{
         },
       },
     };
+    if(this.state.redirect&&checkLogin){
+      return <Redirect push to={loginhref}/>
+    }
     return(
       <div>
       <br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/>
@@ -118,9 +164,9 @@ class Login extends React.Component{
       label="用户名"
       >
       {getFieldDecorator('用户名', {
-      rules: [{required: true, message: '请输入用户名!'}],
+      rules: [{required: true, message: '请输入用户名!',whitespace:true}],
       })(
-        <Input />
+        <Input placeholder="可以是用户名、手机号或学号" />
       )}
       </FormItem>
       <FormItem
@@ -128,9 +174,9 @@ class Login extends React.Component{
       label="密码"
       >
       {getFieldDecorator('密码', {
-      rules: [{required: true, message: '请输入密码!'}],
+      rules: [{required: true, message: '请输入密码!',whitespace:true}],
       })(
-        <Input />
+        <Input type="password" />
       )}
       </FormItem>
       <FormItem {...tailFormItemLayout}>
@@ -533,6 +579,7 @@ const WrappedLogin=Form.create()(Login);
 
 class Topfield extends React.Component
 {   
+
     render()
     {
         return (
@@ -544,5 +591,18 @@ class Topfield extends React.Component
         
     }
 }
-ReactDOM.render(<Topfield />, document.getElementById('root'));
+
+const Main=()=>(
+  <main>
+    <Switch>
+      <Route exact path='/' component={Topfield}/>
+    </Switch>
+  </main>
+)
+
+ReactDOM.render((
+<BrowserRouter>
+<Main/>
+</BrowserRouter>
+),document.getElementById('root'));
 registerServiceWorker();
