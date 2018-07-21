@@ -5,6 +5,7 @@ import registerServiceWorker from './registerServiceWorker';
 import {Modal,Button,Input,Tag,Form,Tooltip,Icon,Cascader,Select,Row,Col,Checkbox,AutoComplete,Radio}from'antd';
 import axios from 'axios';
 import {Route,Switch,Link,HashRouter,BrowserRouter,Redirect} from 'react-router-dom';
+import ValidateEmail from './validateEmail.js'
 const FormItem = Form.Item;
 const Option = Select.Option;
 const RadioGroup = Radio.Group;
@@ -18,7 +19,7 @@ var vaildEmail=/^[a-zA-Z0-9_.-]+@[a-zA-Z0-9-]+(\.[a-zA-Z0-9-]+)*\.[a-zA-Z0-9]{2,
 var validPhone=/^1\d{10}$/;
 var validPassword =/^\w{6,20}$/;
 var postUser=axios.create({
-  url:"http://106.14.148.208:8080/data/users/",
+  url:"http://106.14.148.208:8088/data/users/",
   headers:{"content-type":"application/json"},
   method:'post',
   data:User,
@@ -26,7 +27,7 @@ var postUser=axios.create({
 });
 
 var loginUser=axios.create({
-  url:"http://106.14.148.208:8080/data/is_repeated/",
+  url:"http://106.14.148.208:8088/data/is_repeated/",
   headers:{"content-type":"application/json"},
   method:'post',
   data:Userlogin,
@@ -34,7 +35,7 @@ var loginUser=axios.create({
 })
 
 var takeToken=axios.create({
-  url:"http://106.14.148.208:8080/login/",
+  url:"http://106.14.148.208:8088/login/",
   headers:{"content-type":"application/json"},
   method:'post',
   data:Userlogin2,
@@ -592,6 +593,7 @@ const Main=()=>(
   <main>
     <Switch>
       <Route exact path='/' component={Topfield}/>
+      <Route path='/emailcheck/' component={ValidateEmail}/>
     </Switch>
   </main>
 )
