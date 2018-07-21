@@ -23,16 +23,21 @@ class User(AbstractUser):
     usertype=models.CharField(max_length=20,choices=[(item,item) for item in ['student','teacher','assistant']],default='student')
     class_number=models.CharField(max_length=10,default='noClass')
     wechat=models.TextField(default='')
+    forgotten=models.BooleanField(default=False)
     # TODO: prefer contact method, wechat
 
 class HWFCourseClass(models.Model):
     name = models.TextField()
     description = models.TextField()
+    marks=models.FloatField(default=0.0)
     creator = models.ForeignKey(User, on_delete=models.PROTECT, related_name='creator_course')
-    teaching_assistants = models.ManyToManyField(User, related_name='teaching_assistants_course')
+    teaching_assistants = models.ManyToManyField(User, related_name='teaching_assistants_course',null=True,default=[])
     # student_representatives = models.ManyToManyField(User, related_name='student_representatives_course')
-    students = models.ManyToManyField(User, related_name='students_course')
+    students = models.ManyToManyField(User, related_name='students_course',null=True,default=[])
     join_code = models.TextField(max_length=512)
+
+    def __unicode__(self):
+        return self.name
 
 
 class HWFAssignment(models.Model):

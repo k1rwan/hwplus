@@ -11,6 +11,7 @@ from data import models
 
 class UserSerializer(serializers.ModelSerializer):
     
+    id=serializers.IntegerField(read_only=True,required=False)
     bupt_id=serializers.CharField(required=False)
     class_number=serializers.CharField(required=False)
     is_active=serializers.BooleanField(read_only=True,required=False)
@@ -32,9 +33,42 @@ class UserSerializer(serializers.ModelSerializer):
         return user
     class Meta:
         model = User
-        fields=('is_active','date_joined','username','name','gender','usertype','password','bupt_id','class_number','email','phone','wechat')
+        fields=('id','is_active','date_joined','username','name','gender','usertype','password','bupt_id','class_number','email','phone','wechat')
+        read_only_fields=('password',)
+
+class UserSerializerCourse(UserSerializer):
+
+    class Meta:
+        model = User
+        fields=('id','username','students_course','creator_course','teaching_assistants_course')
+        read_only_fields=('id','username')
+
+
+class UserSerializerCourseForStudent(UserSerializerCourse):
+
+    class Meta:
+        model = User
+        fields=('id','username','students_course')
+        read_only_fields=('id','username')
+
+
+class UserSerializerCourseForTeacher(UserSerializerCourse):
+
+    class Meta:
+        model=User
+        fields=('id','username','creator_course')
+        read_only_fields=('id','username')
+
+class UserSerializerCourseForAssistant(UserSerializerCourse):
+
+    class Meta:
+        model=User
+        fields=('id','username','teaching_assistants_course')
+        read_only_fields=('id','username')
+
 
 class HWFCourseClassSerializer(serializers.ModelSerializer):
+
     class Meta:
         model=models.HWFCourseClass
         fields='__all__'
