@@ -19,7 +19,7 @@ var vaildEmail=/^[a-zA-Z0-9_.-]+@[a-zA-Z0-9-]+(\.[a-zA-Z0-9-]+)*\.[a-zA-Z0-9]{2,
 var validPhone=/^1\d{10}$/;
 var validPassword =/^\w{6,20}$/;
 var postUser=axios.create({
-  url:"http://106.14.148.208:8088/data/users/",
+  url:"http://106.14.148.208:8080/data/users/",
   headers:{"content-type":"application/json"},
   method:'post',
   data:User,
@@ -27,7 +27,7 @@ var postUser=axios.create({
 });
 
 var loginUser=axios.create({
-  url:"http://106.14.148.208:8088/data/is_repeated/",
+  url:"http://106.14.148.208:8080/data/is_repeated/",
   headers:{"content-type":"application/json"},
   method:'post',
   data:Userlogin,
@@ -35,7 +35,7 @@ var loginUser=axios.create({
 })
 
 var takeToken=axios.create({
-  url:"http://106.14.148.208:8088/login/",
+  url:"http://106.14.148.208:8080/login/",
   headers:{"content-type":"application/json"},
   method:'post',
   data:Userlogin2,

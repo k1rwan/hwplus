@@ -5,23 +5,16 @@ import axios from 'axios';
 import {Route,Switch,Link,HashRouter,BrowserRouter,Redirect} from 'react-router-dom';
 var gotToken='';
 var postToken=axios.create({
-    url:"http://106.14.148.208:8088/account/activate/",
+    url:"http://106.14.148.208:8080/account/activate/",
     headers:{"content-type":"application/json","token":gotToken},
     method:'post',
     timeout:1000,
 })
-
-function GetQueryString(name){
-    var reg = new RegExp("(^|&)"+ name +"=([^&]*)(&|$)");
-    var r = window.location.href.substr(1).match(reg);
-    if(r!=null){return unescape(r[2]);}
-    return null;
-}
-
+var re=/^([0-9a-zA-Z\_\.\/\:]*)\?token=([0-9A-Za-z\.]*)$/;
 class ValidateEmail extends React.Component{
    componentDidMount(){
        if(gotToken===''){
-           gotToken=GetQueryString("token");
+           gotToken=re.exec(window.location.href)[2];
            console.log(gotToken);
            postToken().then(function(response){
                console.log(response);
