@@ -132,8 +132,8 @@ REST_FRAMEWORK = {
 }
 
 #media
+MEDIA_ROOT=os.path.join(BASE_DIR,'data','backend_media')
 MEDIA_URL='/media/'
-MEDIA_ROOT=os.path.join(BASE_DIR,'backend_media')
 
 #Change User config from default.
 AUTH_USER_MODEL='data.User'

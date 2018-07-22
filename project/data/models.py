@@ -1,39 +1,51 @@
 from django.contrib.auth.models import AbstractUser
 from django.db import models
+
 # from project.settings import MEDIA_ROOT
 
+
 def default_bupt_id():
-    count=User.objects.all().count()
+    count = User.objects.all().count()
     return 'noBuptId'+str(count)
 
+
 def default_phone():
-    count=User.objects.all().count()
+    count = User.objects.all().count()
     return 'noPhone'+str(count)
 
 # User prototype
+
 class User(AbstractUser):
-    date_joined=models.DateTimeField(auto_now_add=True,null=True)
-    # carrier for bupt_id, e.g. 2010110001
-    bupt_id = models.CharField(max_length=10, unique=True,default=default_bupt_id)
-    name=models.TextField(default='')
-    email=models.EmailField(unique=True)
-    # phone number
-    phone = models.CharField(max_length=11,unique=True,default=default_phone)
-    gender=models.CharField(max_length=6,choices=[(item,item) for item in ['male','female']],default='male')
-    usertype=models.CharField(max_length=20,choices=[(item,item) for item in ['student','teacher','assistant']],default='student')
-    class_number=models.CharField(max_length=10,default='noClass')
-    wechat=models.TextField(default='')
-    forgotten=models.BooleanField(default=False)
-    # TODO: prefer contact method, wechat
+    date_joined = models.DateTimeField(auto_now_add=True, null=True)
+    bupt_id = models.CharField(
+        max_length=10, unique=True, default=default_bupt_id)
+    name = models.TextField(default='')
+    email = models.EmailField(unique=True)
+    phone = models.CharField(max_length=11, unique=True, default=default_phone)
+    gender = models.CharField(max_length=6, choices=[(
+        item, item) for item in ['male', 'female']], default='male')
+    usertype = models.CharField(max_length=20, choices=[(item, item) for item in [
+                                'student', 'teacher', 'assistant']], default='student')
+    class_number = models.CharField(max_length=10, default='noClass')
+    wechat = models.TextField(default='')
+    forgotten = models.BooleanField(default=False)
+    url_height = models.PositiveIntegerField(default=75)
+    url_width = models.PositiveIntegerField(default=75)
+    useravatar = models.ImageField(
+        upload_to="avatars", height_field='url_height', width_field='url_width', null=True)
+
 
 class HWFCourseClass(models.Model):
     name = models.TextField()
     description = models.TextField()
-    marks=models.FloatField(default=0.0)
-    creator = models.ForeignKey(User, on_delete=models.PROTECT, related_name='creator_course')
-    teaching_assistants = models.ManyToManyField(User, related_name='teaching_assistants_course',null=True,default=[])
+    marks = models.FloatField(default=0.0)
+    creator = models.ForeignKey(
+        User, on_delete=models.PROTECT, related_name='creator_course')
+    teaching_assistants = models.ManyToManyField(
+        User, related_name='teaching_assistants_course', null=True, default=[])
     # student_representatives = models.ManyToManyField(User, related_name='student_representatives_course')
-    students = models.ManyToManyField(User, related_name='students_course',null=True,default=[])
+    students = models.ManyToManyField(
+        User, related_name='students_course', null=True, default=[])
     join_code = models.TextField(max_length=512)
 
     def __unicode__(self):
@@ -55,12 +67,14 @@ class HWFSupportFileExtension(models.Model):
 # Any uploaded file is a HWFFile
 # unique by hashcode
 class HWFFile(models.Model):
-    extension = models.ForeignKey(HWFSupportFileExtension, on_delete=models.PROTECT)
+    extension = models.ForeignKey(
+        HWFSupportFileExtension, on_delete=models.PROTECT)
     data = models.FileField()
     hashcode = models.TextField(unique=True)
     # copyright user
     initial_upload_time = models.DateTimeField(editable=False)
-    initial_upload_user = models.ForeignKey(User, on_delete=models.PROTECT, editable=False)
+    initial_upload_user = models.ForeignKey(
+        User, on_delete=models.PROTECT, editable=False)
 
 
 # submission to an assignment
@@ -111,7 +125,8 @@ class HWFFileAnswer(HWFAnswer):
 
 class HWFSelectQuestion(HWFQuestion):
     is_multiple_choices = models.BooleanField(default=False)
-    correct_answer = models.ForeignKey(HWFSelectAnswer, on_delete=models.CASCADE)
+    correct_answer = models.ForeignKey(
+        HWFSelectAnswer, on_delete=models.CASCADE)
 
     def __init__(self, *args, **kwargs):
         self._meta.get_field('auto_score').default = True
@@ -137,7 +152,8 @@ class HWFReviewTag(models.Model):
 
 class HWFReview(models.Model):
     mark_review = models.ForeignKey(HWFReviewTag, on_delete=models.PROTECT)
-    reviewer = models.ForeignKey(User, related_name='reviewer_review', on_delete=models.PROTECT)
+    reviewer = models.ForeignKey(
+        User, related_name='reviewer_review', on_delete=models.PROTECT)
     text = models.TextField()
     answer = models.ForeignKey(HWFAnswer, on_delete=models.PROTECT)
     is_graph_review = models.BooleanField(default=False)

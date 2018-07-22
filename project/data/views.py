@@ -1,54 +1,54 @@
 # Create your views here.
-from rest_framework import viewsets
-from data import models
-from data.models import User
-from data import serializers
-from data import permissions
-from project.settings import API_AUTH_KEY, SECRET_KEY
-from data.confirm import Token, ShortToken
-from data.confirm import send
-from rest_framework.response import Response
-from rest_framework.decorators import api_view
-from rest_framework import status
-from itsdangerous import SignatureExpired
 import re
 
+from itsdangerous import SignatureExpired
+from rest_framework import status, viewsets
+from rest_framework.decorators import api_view
+from rest_framework.response import Response
+
+from data import models, permissions, serializers
+from data.confirm import ShortToken, Token, send
+from data.models import User
+from project.settings import API_AUTH_KEY, SECRET_KEY
+
 token = Token(SECRET_KEY.encode())
-short_token=ShortToken(SECRET_KEY.encode())
-results={
-    'SUCCESS':{
-        'code':1000,
-        'msg':'success'
+short_token = ShortToken(SECRET_KEY.encode())
+results = {
+    'SUCCESS': {
+        'code': 1000,
+        'msg': 'success'
     },
-    'INACTIVE':{
-        'code':4020,
-        'msg':'用户未激活'
+    'INACTIVE': {
+        'code': 4020,
+        'msg': '用户未激活'
     },
-    'EXPIRED':{
-        'code':4030,
-        'msg':'身份验证过期，请重新登录',
+    'EXPIRED': {
+        'code': 4030,
+        'msg': '身份验证过期，请重新登录',
     },
-    'PWD_ERR':{
-        'code':4040,
-        'msg':'用户名或密码错误'
+    'PWD_ERR': {
+        'code': 4040,
+        'msg': '用户名或密码错误'
     }
 }
 
 data = None
 headers = None
 
+
 def init():
-    global data,headers
+    global data, headers
     data = {
         'result': {
-            'code':None,
-            'msg':None
+            'code': None,
+            'msg': None
         },
         'data': None
     }
     headers = {
         'token': None
     }
+
 
 class HWFCourseClassViewSet(viewsets.ModelViewSet):
     queryset = models.HWFCourseClass.objects.all()
