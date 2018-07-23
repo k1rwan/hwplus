@@ -14,6 +14,7 @@ var User={name:'',username:'',gender:'',usertype:'',password:'',wechat:'',bupt_i
 var Userlogin={type:'',content:''};
 var Userlogin2={username:'',password:''};
 var loginhref='';
+var userinformation='';
 var checkLogin=0;//判断是否在正确的入口登录
 var vaildEmail=/^[a-zA-Z0-9_.-]+@[a-zA-Z0-9-]+(\.[a-zA-Z0-9-]+)*\.[a-zA-Z0-9]{2,6}$/;
 var validPhone=/^1\d{10}$/;
@@ -42,6 +43,14 @@ var takeToken=axios.create({
   timeout:1000,
 })
 
+var forgetPassword=axios.create({
+  url:"http://106.14.148.208:8080/account/forget_password/",
+  headers:{"content-type":"application/json"},
+  method:'post',
+  data:userinformation,
+  timeout:1000,
+})
+
 class Login extends React.Component{
   constructor(props){
     super(props);
@@ -49,6 +58,7 @@ class Login extends React.Component{
       entry:false,
       redirect:false,
       loginTitle:"学生登录",
+      visible3:false,
     }
   }
 
@@ -99,6 +109,17 @@ class Login extends React.Component{
   });
 }
 
+   handleEnter=()=>{
+     this.setState({entry:false,visible3:true});
+   }
+
+   handleCancel2=()=>{
+     this.setState({visible3:false});
+   }
+
+   handleOk=()=>{
+     this.setState({visible3:false});
+   }
   render(){
     const { getFieldDecorator } = this.props.form;
     const { autoCompleteResult } = this.state;
@@ -178,9 +199,24 @@ class Login extends React.Component{
       )}
       </FormItem>
       <FormItem {...tailFormItemLayout}>
+        <Button className="forgetpassword" onClick={this.handleEnter}>忘记密码？</Button>
+      </FormItem>
+      <FormItem {...tailFormItemLayout}>
         <Button type="primary" htmlType="submit" className="submit" >确认</Button>
       </FormItem>
       </Form>
+      </Modal>
+      <Modal
+              title="忘记密码"
+              visible={this.state.visible3}
+              footer={[
+                <Button key="cancel" onClick={this.handleCancel2}>取消</Button>,
+                <Button key="submit" type="primary" onClick={this.handleOk}>确认</Button>
+              ]}
+              onCancel={this.handleCancel2}
+              destroyOnClose={true}
+            >
+      <Input addonBefore="输入用户信息" placeholder="可以是邮箱、学号、用户名、手机号"/>
       </Modal>
       </div>
     )

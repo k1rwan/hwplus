@@ -20,6 +20,11 @@ body {
   left:15%;
 }
 
+.forgetpassword{
+  position:relative;
+  left:9%;
+}
+
 .studententry{
   left:33%;
   height:50px;
