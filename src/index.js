@@ -6,6 +6,7 @@ import {Modal,Button,Input,Tag,Form,Tooltip,Icon,Cascader,Select,Row,Col,Checkbo
 import axios from 'axios';
 import {Route,Switch,Link,HashRouter,BrowserRouter,Redirect} from 'react-router-dom';
 import ValidateEmail from './validateEmail.js'
+import WrappedModifyPassword from './modifyPassword.js'
 const FormItem = Form.Item;
 const Option = Select.Option;
 const RadioGroup = Radio.Group;
@@ -13,14 +14,14 @@ const RadioGroup = Radio.Group;
 var User={name:'',username:'',gender:'',usertype:'',password:'',wechat:'',bupt_id:'',class_number:'',email:'',phone:''};
 var Userlogin={type:'',content:''};
 var Userlogin2={username:'',password:''};
+var userinformation={username:''};
 var loginhref='';
-var userinformation='';
 var checkLogin=0;//判断是否在正确的入口登录
 var vaildEmail=/^[a-zA-Z0-9_.-]+@[a-zA-Z0-9-]+(\.[a-zA-Z0-9-]+)*\.[a-zA-Z0-9]{2,6}$/;
 var validPhone=/^1\d{10}$/;
 var validPassword =/^\w{6,20}$/;
 var postUser=axios.create({
-  url:"http://106.14.148.208:8080/data/users/",
+  url:"http://106.14.148.208:8088/data/users/",
   headers:{"content-type":"application/json"},
   method:'post',
   data:User,
@@ -28,7 +29,7 @@ var postUser=axios.create({
 });
 
 var loginUser=axios.create({
-  url:"http://106.14.148.208:8080/data/is_repeated/",
+  url:"http://106.14.148.208:8088/data/is_repeated/",
   headers:{"content-type":"application/json"},
   method:'post',
   data:Userlogin,
@@ -36,7 +37,7 @@ var loginUser=axios.create({
 })
 
 var takeToken=axios.create({
-  url:"http://106.14.148.208:8080/login/",
+  url:"http://106.14.148.208:8088/login/",
   headers:{"content-type":"application/json"},
   method:'post',
   data:Userlogin2,
@@ -44,7 +45,7 @@ var takeToken=axios.create({
 })
 
 var forgetPassword=axios.create({
-  url:"http://106.14.148.208:8080/account/forget_password/",
+  url:"http://106.14.148.208:8088/account/forget_password/",
   headers:{"content-type":"application/json"},
   method:'post',
   data:userinformation,
@@ -118,7 +119,18 @@ class Login extends React.Component{
    }
 
    handleOk=()=>{
+     userinformation.username=document.getElementById("information").value;
+     console.log(userinformation.username);
      this.setState({visible3:false});
+     forgetPassword().then(function(response){
+       const modal = Modal.success({
+        title:"修改密码的网址已发到您的邮箱里，请及时查收",
+        okText:"确认",
+      });
+     })
+     .catch(function(error){
+       console.log(error);
+     })
    }
   render(){
     const { getFieldDecorator } = this.props.form;
@@ -216,7 +228,7 @@ class Login extends React.Component{
               onCancel={this.handleCancel2}
               destroyOnClose={true}
             >
-      <Input addonBefore="输入用户信息" placeholder="可以是邮箱、学号、用户名、手机号"/>
+      <Input addonBefore="输入用户信息" placeholder="可以是邮箱、学号、用户名、手机号" id="information"/>
       </Modal>
       </div>
     )
@@ -348,7 +360,6 @@ class Register extends React.Component{
       const form=this.props.form;
       Userlogin.type="bupt_id";
       Userlogin.content=form.getFieldValue('学号');
-      console.log(Userlogin.content)
       if(Userlogin.content!==undefined){
       loginUser().then(function(response){
         if(value&&response.data.data.repeat){
@@ -630,6 +641,7 @@ const Main=()=>(
     <Switch>
       <Route exact path='/' component={Topfield}/>
       <Route path='/emailcheck/' component={ValidateEmail}/>
+      <Route path='/forgetpassword/' component={WrappedModifyPassword}/>
     </Switch>
   </main>
 )
