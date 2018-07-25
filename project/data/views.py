@@ -50,11 +50,6 @@ def init():
     }
 
 
-class HWFCourseClassViewSet(viewsets.ModelViewSet):
-    queryset = models.HWFCourseClass.objects.all()
-    serializer_class = serializers.HWFCourseClassSerializer
-
-
 class HWFAssignmentViewSet(viewsets.ModelViewSet):
     queryset = models.HWFAssignment.objects.all()
     serializer_class = serializers.HWFAssignmentSerializer

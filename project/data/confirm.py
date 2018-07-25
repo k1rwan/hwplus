@@ -19,7 +19,7 @@ class ShortToken():
         serializer = utsr(self.security_key)
         return serializer.dumps(username, self.salt)
 
-    def confirm_validate_token(self, token, expiration=600):
+    def confirm_validate_token(self, token, expiration=6000):
         serializer = utsr(self.security_key)
         return serializer.loads(token, salt=self.salt, max_age=expiration)
 
@@ -54,6 +54,6 @@ def send_forget(user):
     global DOMAIN
     token_confirm = ShortToken(SECRET_KEY.encode())
     token = token_confirm.generate_validate_token(user.username)
-    message = "\n".join(['%s您好!', '您忘记了密码, 请点击下面的链接来找回您的密码: ' % user.username,
+    message = "\n".join(['%s您好!' % user.username, '您忘记了密码, 请点击下面的链接来找回您的密码: ',
                          'http://'+'/'.join([DOMAIN, 'forgetpassword', '?token='+str(token)])])
     send_mail('HomeworkPlus', message, 'liadrinz@163.com', [user.email])

@@ -58,6 +58,9 @@ class HWFAssignment(models.Model):
     description = models.TextField()
     deadline = models.DateTimeField()
 
+    def __unicode__(self):
+        return self.name
+
 
 class HWFSupportFileExtension(models.Model):
     name = models.TextField()

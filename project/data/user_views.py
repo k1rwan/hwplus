@@ -278,7 +278,7 @@ def forget_password(request):
     data['result'] = results['SUCCESS']
     return Response(data=data, headers=headers)
 
-
+@api_view(['POST'])
 def confirm_forgotten(request):
     init()
     global data, headers, short_token
@@ -288,12 +288,13 @@ def confirm_forgotten(request):
         user_obj.forgotten = True
         user_obj.save()
         data['result'] = results['SUCCESS']
+        serializer=serializers.UserSerializer(user_obj)
+        data['data']=serializer.data
         return Response(data=data, headers=headers)
-    else:
-        data['result'] = results['EXPIRED']
-        return Response(data=data, headers=headers)
+    data['result'] = results['EXPIRED']
+    return Response(data=data, headers=headers)
 
-
+@api_view(['POST'])
 def directly_change(request):
     init()
     global data, headers, short_token
@@ -302,7 +303,16 @@ def directly_change(request):
         usrn_obj = User.objects.get(username=usrn)
         if usrn_obj.forgotten:
             usrn_obj.set_password(request.data['new_pass'])
+            usrn_obj.forgotten = False
             usrn_obj.save()
             data['result'] = results['SUCCESS']
             return Response(data=data, headers=headers)
     return Response(data=data, headers=headers, status=status.HTTP_403_FORBIDDEN)
+
+@api_view(['POST'])
+def upload_avatar(request):
+    init()
+    global data, headers, token
+    usrn=token.confirm_validate_token(request.META['HTTP_TOKEN'])
+    if usrn:
+        usrn_obj = User.objects.get(username=usrn)
