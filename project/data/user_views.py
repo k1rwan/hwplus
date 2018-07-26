@@ -308,11 +308,3 @@ def directly_change(request):
             data['result'] = results['SUCCESS']
             return Response(data=data, headers=headers)
     return Response(data=data, headers=headers, status=status.HTTP_403_FORBIDDEN)
-
-@api_view(['POST'])
-def upload_avatar(request):
-    init()
-    global data, headers, token
-    usrn=token.confirm_validate_token(request.META['HTTP_TOKEN'])
-    if usrn:
-        usrn_obj = User.objects.get(username=usrn)

@@ -1,9 +1,9 @@
 from django.conf.urls import include, url
 from django.conf.urls.static import static
 from rest_framework.routers import DefaultRouter
-from project import settings
 
-from data import course_class_views, user_views, views
+from data import assignment_views, course_class_views, user_views, views
+from project import settings
 
 router = DefaultRouter()
 # router.register('courses',course_class_views.HWFCourseClassViewSet,'course')
@@ -46,3 +46,10 @@ urlpatterns += [
 ]
 
 urlpatterns += static(settings.MEDIA_URL,document_root=settings.MEDIA_ROOT)
+
+urlpatterns += [
+    url(r'^data/assignments/$',assignment_views.HWFAssignmentListView.as_view()),
+    url(r'^data/assignments/(?P<pk>[0-9]+)/$',assignment_views.HWFAssignmentDetailView.as_view()),
+    url(r'^data/course_with_assignment/$',assignment_views.CourseClassWithAssignments.as_view()),
+    url(r'^data/course_with_assignment/(?P<pk>[0-9]+)/$',assignment_views.CourseClassDetailWithAssignments.as_view())
+]

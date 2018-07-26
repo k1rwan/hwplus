@@ -48,23 +48,17 @@ class HWFCourseClass(models.Model):
         User, related_name='students_course', null=True, default=[])
     join_code = models.TextField(max_length=512)
 
-    def __unicode__(self):
+    def __str__(self):
         return self.name
 
-
-class HWFAssignment(models.Model):
-    course_class = models.ForeignKey(HWFCourseClass, on_delete=models.PROTECT)
-    name = models.TextField()
-    description = models.TextField()
-    deadline = models.DateTimeField()
-
-    def __unicode__(self):
-        return self.name
 
 
 class HWFSupportFileExtension(models.Model):
     name = models.TextField()
     extension_regex = models.TextField()
+
+    def __str__(self):
+        return self.name
 
 
 # Any uploaded file is a HWFFile
@@ -72,12 +66,22 @@ class HWFSupportFileExtension(models.Model):
 class HWFFile(models.Model):
     extension = models.ForeignKey(
         HWFSupportFileExtension, on_delete=models.PROTECT)
-    data = models.FileField()
-    hashcode = models.TextField(unique=True)
+    data = models.FileField(upload_to='file', null=True)
     # copyright user
-    initial_upload_time = models.DateTimeField(editable=False)
+    initial_upload_time = models.DateTimeField(auto_now_add=True)
     initial_upload_user = models.ForeignKey(
-        User, on_delete=models.PROTECT, editable=False)
+        User, on_delete=models.PROTECT)
+
+
+class HWFAssignment(models.Model):
+    course_class = models.ForeignKey(HWFCourseClass, on_delete=models.PROTECT, related_name='course_assignments')
+    name = models.TextField()
+    description = models.TextField()
+    addfile = models.ManyToManyField(HWFFile,related_name='assignment')
+    deadline = models.DateTimeField()
+
+    def __str__(self):
+        return self.name
 
 
 # submission to an assignment

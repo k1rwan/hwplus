@@ -10,3 +10,10 @@ class HWFAssignmentDetailView(generics.RetrieveUpdateDestroyAPIView):
     queryset = models.HWFAssignment.objects.all()
     serializer_class = serializers.HWFAssignmentSerializer
 
+class CourseClassWithAssignments(generics.ListAPIView):
+    queryset = models.HWFCourseClass.objects.all()
+    serializer_class = serializers.HWFCourseClassSerializerWithAssignments
+
+class CourseClassDetailWithAssignments(generics.RetrieveUpdateAPIView):
+    queryset = models.HWFCourseClass.objects.all()
+    serializer_class = serializers.HWFCourseClassSerializerWithAssignments

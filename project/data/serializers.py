@@ -87,6 +87,11 @@ class HWFAssignmentSerializer(serializers.ModelSerializer):
         model = models.HWFAssignment
         fields = '__all__'
 
+class HWFCourseClassSerializerWithAssignments(serializers.ModelSerializer):
+    
+    class Meta:
+        model=models.HWFCourseClass
+        fields = ('id','name', 'description', 'course_assignments')
 
 class HWFSupportFileExtensionSerializer(serializers.ModelSerializer):
     class Meta:
