@@ -149,7 +149,7 @@ class ModifyPassword extends React.Component{
             )}
             </FormItem>
             <FormItem {...tailFormItemLayout}>
-            <Button type="primary" htmlType="submit" className="submit">确认</Button>
+            <Button type="primary" htmlType="submit" className="submit3">确认</Button>
             </FormItem>
             </Form>
             </div>

@@ -16,7 +16,12 @@ body {
   width:100px;
 }
 .submit{
-  position:relative;
+  position:static;
+  width:100px;
+  left:15%;
+}
+
+.submit2{
   left:15%;
 }
 
