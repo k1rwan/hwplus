@@ -81,7 +81,6 @@ class HWFCourseClassSerializer(serializers.ModelSerializer):
         model = models.HWFCourseClass
         fields = '__all__'
 
-
 class HWFAssignmentSerializer(serializers.ModelSerializer):
     class Meta:
         model = models.HWFAssignment

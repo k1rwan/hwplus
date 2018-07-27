@@ -189,3 +189,6 @@ CORS_EXPOSE_HEADERS=(
     'authed',
     'expired'
 )
+
+FRONTEND_DOMAIN = "localhost:3000"
+BACKEND_DOMIAN = "106.14.148.208:8088"

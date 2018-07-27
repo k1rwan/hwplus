@@ -46,7 +46,7 @@ class HWFCourseClass(models.Model):
     # student_representatives = models.ManyToManyField(User, related_name='student_representatives_course')
     students = models.ManyToManyField(
         User, related_name='students_course', null=True, default=[])
-    join_code = models.TextField(max_length=512)
+    join_code = models.TextField(max_length=512, null=True)
 
     def __str__(self):
         return self.name

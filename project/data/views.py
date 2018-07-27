@@ -1,6 +1,7 @@
 # Create your views here.
 import re
 
+import qrcode
 from itsdangerous import SignatureExpired
 from rest_framework import status, viewsets
 from rest_framework.decorators import api_view
@@ -49,10 +50,11 @@ def init():
         'token': None
     }
 
-
-class HWFAssignmentViewSet(viewsets.ModelViewSet):
-    queryset = models.HWFAssignment.objects.all()
-    serializer_class = serializers.HWFAssignmentSerializer
+@api_view(['POST'])
+def get_qrcode(request):
+    qr = qrcode.make(request.data['content'])
+    qr.save("./data/backend_media/invitation_qr/ppp.jpg")
+    return Response(data={"qrcode":"http://localhost:8000/media/invitation_qr/ppp.jpg"})
 
 
 class HWFFileViewSet(viewsets.ModelViewSet):

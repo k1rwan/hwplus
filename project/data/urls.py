@@ -7,7 +7,7 @@ from project import settings
 
 router = DefaultRouter()
 # router.register('courses',course_class_views.HWFCourseClassViewSet,'course')
-router.register('assignments', views.HWFAssignmentViewSet, 'assignment')
+# router.register('assignments', views.HWFAssignmentViewSet, 'assignment')
 router.register('files', views.HWFFileViewSet, 'file')
 router.register('submissions', views.HWFSubmissionViewSet, 'submission')
 router.register('questions', views.HWFQuestionViewSet, 'question')
@@ -42,7 +42,7 @@ urlpatterns += [
     url(r'^data/user_with_course/assistant/$',
         course_class_views.UserWithCourseListViewForAssistant.as_view()),
     url(r'^data/user_with_course/assistant/(?P<pk>[0-9]+)/$',
-        course_class_views.UserWithCourseDetailViewForAssistant.as_view()),
+        course_class_views.UserWithCourseDetailViewForAssistant.as_view())
 ]
 
 urlpatterns += static(settings.MEDIA_URL,document_root=settings.MEDIA_ROOT)
@@ -52,4 +52,8 @@ urlpatterns += [
     url(r'^data/assignments/(?P<pk>[0-9]+)/$',assignment_views.HWFAssignmentDetailView.as_view()),
     url(r'^data/course_with_assignment/$',assignment_views.CourseClassWithAssignments.as_view()),
     url(r'^data/course_with_assignment/(?P<pk>[0-9]+)/$',assignment_views.CourseClassDetailWithAssignments.as_view())
+]
+
+urlpatterns += [
+    url(r'^data/get_qrcode/$',views.get_qrcode),
 ]
