@@ -7,6 +7,7 @@ import axios from 'axios';
 import {Route,Switch,Link,HashRouter,BrowserRouter,Redirect} from 'react-router-dom';
 import ValidateEmail from './validateEmail.js'
 import WrappedModifyPassword from './modifyPassword.js'
+import StudentIndex from './studentindex.js'
 const FormItem = Form.Item;
 const Option = Select.Option;
 const RadioGroup = Radio.Group;
@@ -642,6 +643,7 @@ const Main=()=>(
       <Route exact path='/' component={Topfield}/>
       <Route path='/emailcheck/' component={ValidateEmail}/>
       <Route path='/forgetpassword/' component={WrappedModifyPassword}/>
+      <Route path='/studentcenter' component={StudentIndex}/>
     </Switch>
   </main>
 )
