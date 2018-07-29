@@ -4,15 +4,43 @@ import './studentindex.css';
 import {Modal,Button,Input,Tag,Icon,Layout,Menu,Breadcrumb,Avatar,Badge,Row,Col}from'antd';
 import axios from 'axios';
 import {Route,Switch,Link,HashRouter,BrowserRouter,Redirect} from 'react-router-dom';
+import Studentcenter from './studentcenter.js'
+import Studentclass from './studentclass.js'
 
 const { SubMenu } = Menu;
 const { Header, Content, Sider } = Layout;
 
-class Studentcenter extends React.Component{
+class StudentIndex extends React.Component{
+   constructor(props){
+    super(props);
+    this.state={
+        key:1,
+        norepeatkey1:true,
+        norepeatkey2:true,
+        norepeatkey3:true,
+        norepeatkey4:true,
+        norepeatkey5:true,
+    }
+ }
+   
+   changehref=({ item, key, keyPath })=>{
+      this.setState({key:key});
+   }
+
     render(){
+      console.log(this.state.key);
+      if(this.state.key==1&&this.state.norepeatkey1){
+        this.setState({norepeatkey1:false,norepeatkey2:true,norepeatkey3:true,norepeatkey4:true,norepeatkey5:true,});
+        return (<Redirect exact push to='/studentcenter'/>);
+       }
+      if(this.state.key==2&&this.state.norepeatkey2){
+       this.setState({norepeatkey1:true,norepeatkey2:false,norepeatkey3:true,norepeatkey4:true,norepeatkey5:true,});
+       return (<Redirect exact push to='/studentcenter/class'/>);
+      }
+
         return(
           <Layout>
-          <Header  className="header" style={{'margin-left':'200px',zindex:1,position:'fixed',width:'100%',background:'#fff'}}>
+          <Header  className="header" style={{marginLeft:'200px',zindex:1,position:'fixed',width:'100%',background:'#fff'}}>
           <div className="logo">Homework+</div>
             <Menu
               theme="light"
@@ -35,8 +63,9 @@ class Studentcenter extends React.Component{
               <Menu
                 mode="inline"
                 theme='light'
-                defaultSelectedKeys={['1']}
+                defaultSelectedKeys={[this.state.key]}
                 style={{ height: '100%'}}
+                onClick={this.changehref}
               >
                   <Menu.Item key="1"><span><Icon type="user" />我的</span></Menu.Item>
                   <Menu.Item key="2"><span><Icon type="usergroup-add" />课程组</span></Menu.Item>
@@ -46,22 +75,13 @@ class Studentcenter extends React.Component{
               </Menu>
             </Sider>
             <Layout style={{ background:'#CCCCCC'}}>
-              <Content style={{ background: '#CCCCCC', "padding-left": 200,"padding-top":64, margin: 0, minHeight: 280 }}>
-              <div style={{ background: '#E7F8A0', textAlign: 'center' }}>
-          ...
-          <br />
-          Really
-          <br />...<br />...<br />...<br />
-          long
-          <br />...<br />...<br />...<br />...<br />...<br />...
-          <br />...<br />...<br />...<br />...<br />...<br />...
-          <br />...<br />...<br />...<br />...<br />...<br />...
-          <br />...<br />...<br />...<br />...<br />...<br />...
-          <br />...<br />...<br />...<br />...<br />...<br />...
-          <br />...<br />...<br />...<br />...<br />...<br />...
-          <br />...<br />...<br />...<br />...<br />...<br />
-          content
-        </div>
+              <Content style={{ background: '#CCCCCC',paddingLeft: 200,paddingTop:64, margin: 0, minHeight: 280 }}>
+                <Switch>
+                    <Route exact path='/studentcenter' component={Studentcenter}/>
+                    <Route exact path='/studentcenter/class' render={(props)=>(
+                      <Studentclass {...props} color="1"/> //传props
+                    )}/>
+                </Switch>
               </Content>
             </Layout>
           </Layout>
@@ -69,6 +89,8 @@ class Studentcenter extends React.Component{
         )
     }
 }
+
+
 
 //const StudentIndex=()=>(
 //    <main>
@@ -86,12 +108,5 @@ class Studentcenter extends React.Component{
 //    </main>    
 //)
 
-const StudentIndex=()=>(
-    <main>
-        <Switch>
-           <Route exact path='/studentcenter/' component={Studentcenter}/>
-        </Switch>
-    </main>    
-)
 
 export default StudentIndex;

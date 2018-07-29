@@ -46,7 +46,7 @@ var takeToken=axios.create({
 })
 
 var forgetPassword=axios.create({
-  url:"http://106.14.148.208:8080/account/forget_password/",
+  url:"http://106.14.148.208:8088/account/forget_password/",
   headers:{"content-type":"application/json"},
   method:'post',
   data:userinformation,
@@ -159,14 +159,14 @@ class Login extends React.Component{
       },
     };
     if(this.state.redirect&&checkLogin){
-      return <Redirect push to={loginhref}/>
+      return <Redirect exact push to={loginhref}/>
     }
     return(
       <div>
       <br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/>
       <Row>
       <Col xs={24} sm={{span:8,offset:8}}>
-      <div className="logo">
+      <div className="mainlogo">
                 Homework+
       </div>
       </Col>
@@ -641,8 +641,8 @@ const Main=()=>(
   <main>
     <Switch>
       <Route exact path='/' component={Topfield}/>
-      <Route path='/emailcheck/' component={ValidateEmail}/>
-      <Route path='/forgetpassword/' component={WrappedModifyPassword}/>
+      <Route path='/emailcheck' component={ValidateEmail}/>
+      <Route path='/forgetpassword' component={WrappedModifyPassword}/>
       <Route path='/studentcenter' component={StudentIndex}/>
     </Switch>
   </main>
