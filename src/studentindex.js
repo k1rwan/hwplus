@@ -1,7 +1,7 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
 import './studentindex.css';
-import {Modal,Button,Input,Tag,Icon,Layout,Menu,Breadcrumb,Avatar,Badge,Row,Col}from'antd';
+import {Modal,Button,Input,Tag,Icon,Layout,Menu,Breadcrumb,Avatar,Badge,Row,Col,Upload,message}from'antd';
 import axios from 'axios';
 import {Route,Switch,Link,HashRouter,BrowserRouter,Redirect} from 'react-router-dom';
 import Studentcenter from './studentcenter.js'
@@ -20,27 +20,73 @@ class StudentIndex extends React.Component{
         norepeatkey3:true,
         norepeatkey4:true,
         norepeatkey5:true,
+        clickmenu:true,//确保是在点击侧边菜单的操作
+        username:"用户名",
     }
  }
    
-   changehref=({ item, key, keyPath })=>{
-      this.setState({key:key});
+   componentWillMount(){
+    if(window.location.pathname==='/studentcenter'){
+      this.setState({norepeatkey1:false})
+    }
+    if(window.location.pathname==='/studentcenter/class'){
+       this.setState({norepeatkey2:false})
+    }
+    //后续随着路径的添加而增加
    }
 
+   componentDidMount(){
+     var getbuptId=axios.create({
+      url:"http://106.14.148.208:8080/data/users/"+localStorage.getItem("userloginKey"),
+      headers:{"content-type":"application/json","token":localStorage.getItem('token')},
+      method:'get',
+      timeout:1000,
+     })
+     var that=this;
+     getbuptId().then(function(response){
+       console.log(response);
+       that.setState({username:response.data.data.username,clickmenu:false})
+     })
+     .catch(function(error){
+       console.log(error);
+     })
+   }
+
+   componentDidUpdate(){
+    if(this.state.key==1&&this.state.norepeatkey1){
+      this.setState({norepeatkey1:false,norepeatkey2:true,norepeatkey3:true,norepeatkey4:true,norepeatkey5:true,});
+     }
+    if(this.state.key==2&&this.state.norepeatkey2){
+     this.setState({norepeatkey1:true,norepeatkey2:false,norepeatkey3:true,norepeatkey4:true,norepeatkey5:true,});
+    }
+    if(this.state.key==3&&this.state.norepeatkey3){
+      this.setState({norepeatkey1:true,norepeatkey2:true,norepeatkey3:false,norepeatkey4:true,norepeatkey5:true,});
+     }
+    if(this.state.key==4&&this.state.norepeatkey4){
+     this.setState({norepeatkey1:true,norepeatkey2:true,norepeatkey3:true,norepeatkey4:false,norepeatkey5:true,});
+    }
+    if(this.state.key==5&&this.state.norepeatkey5){
+      this.setState({norepeatkey1:true,norepeatkey2:true,norepeatkey3:true,norepeatkey4:true,norepeatkey5:false,});
+     }
+   }
+
+   changehref=({ item, key, keyPath })=>{
+      this.setState({key:key,clickmenu:true,});
+   }
+  
     render(){
-      console.log(this.state.key);
-      if(this.state.key==1&&this.state.norepeatkey1){
-        this.setState({norepeatkey1:false,norepeatkey2:true,norepeatkey3:true,norepeatkey4:true,norepeatkey5:true,});
+      console.log(localStorage.getItem('token'));
+      console.log(window.location)
+      if(this.state.key==1&&this.state.norepeatkey1&&this.state.clickmenu){
         return (<Redirect exact push to='/studentcenter'/>);
        }
-      if(this.state.key==2&&this.state.norepeatkey2){
-       this.setState({norepeatkey1:true,norepeatkey2:false,norepeatkey3:true,norepeatkey4:true,norepeatkey5:true,});
+      if(this.state.key==2&&this.state.norepeatkey2&&this.state.clickmenu){
        return (<Redirect exact push to='/studentcenter/class'/>);
       }
-
+      //后续随着路径的添加而增加
         return(
           <Layout>
-          <Header  className="header" style={{marginLeft:'200px',zindex:1,position:'fixed',width:'100%',background:'#fff'}}>
+          <Header  className="header" style={{marginLeft:'200px',zIndex:1,position:'fixed',width:'100%',background:'#fff'}}>
           <div className="logo">Homework+</div>
             <Menu
               theme="light"
@@ -51,8 +97,8 @@ class StudentIndex extends React.Component{
              <Col xs={10} sm={24}>
              <div className="avatar">
              <Button className="info">5通知</Button>
-             <a><Badge count={5} ><Avatar shape="circle" icon="user" /></Badge></a>
-             <Tag className="username">用户名</Tag>
+             <a><Badge count={5} ><Avatar shape="circle" icon="user" size="large" /></Badge></a>
+             <Tag className="username" color="geekblue">{this.state.username}</Tag>
              </div>
              </Col>
             </Row>

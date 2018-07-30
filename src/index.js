@@ -90,6 +90,7 @@ class Login extends React.Component{
     takeToken().then(function(response){
       localStorage.setItem("token",response.headers.token);
       localStorage.setItem("type",response.data.data.usertype);
+      localStorage.setItem("userloginKey",response.data.data.id);
       if(localStorage.getItem("type")==='student'&&that.state.loginTitle==="学生登录"){
         checkLogin=1;
         loginhref="/studentcenter";
@@ -537,7 +538,7 @@ class Register extends React.Component{
             >
             {getFieldDecorator('微信号', {
             rules: [{
-              required: true, message: '请输入你的微信号!',whitespace:true
+              required: false, message: '请输入你的微信号!',whitespace:true
             }, {
               validator: this.checkVaildWechat,
             }],
