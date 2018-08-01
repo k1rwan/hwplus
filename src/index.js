@@ -262,7 +262,6 @@ class Register extends React.Component{
           User.gender=values.性别;
           User.usertype=values.身份;
           User.password=values.密码;
-          User.wechat=values.微信号;
           User.bupt_id=values.学号;
           User.class_number=values.班级号;
           if(User.usertype==="teacher"||User.usertype==="assistant"){
@@ -377,21 +376,6 @@ class Register extends React.Component{
      if(Userlogin.content===undefined){
      callback();
      }
-    }
-    checkVaildWechat=(rule,value,callback)=>{
-      const form=this.props.form;
-      Userlogin.type="wechat";
-      Userlogin.content=form.getFieldValue('微信号');
-      loginUser().then(function(response){
-        if(value&&response.data.data.repeat){
-          callback('该微信号已被注册!');
-        }else{
-          callback();
-        }
-      })      
-      .catch(function(error){
-        console.log(error);
-      });
     }
     checkStudent=(e)=>{
       if(e.target.value==="student"){
@@ -530,20 +514,6 @@ class Register extends React.Component{
             }],
              })(
             <Input type="password" onBlur={this.handleConfirmBlur} />
-            )}
-            </FormItem>
-            <FormItem
-             {...formItemLayout}
-             label="微信号"
-            >
-            {getFieldDecorator('微信号', {
-            rules: [{
-              required: false, message: '请输入你的微信号!',whitespace:true
-            }, {
-              validator: this.checkVaildWechat,
-            }],
-            })(
-            <Input />
             )}
             </FormItem>
             <FormItem

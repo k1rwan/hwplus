@@ -1,14 +1,15 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
 import './studentindex.css';
-import {Modal,Button,Input,Tag,Icon,Layout,Menu,Breadcrumb,Avatar,Badge,Row,Col,Upload,message}from'antd';
+import {Modal,Button,Input,Tag,Icon,Layout,Menu,Breadcrumb,Avatar,Badge,Row,Col}from'antd';
 import axios from 'axios';
 import {Route,Switch,Link,HashRouter,BrowserRouter,Redirect} from 'react-router-dom';
-import Studentcenter from './studentcenter.js'
+import WrappedStudentcenter from './studentcenter.js'
 import Studentclass from './studentclass.js'
 
 const { SubMenu } = Menu;
 const { Header, Content, Sider } = Layout;
+var userinformation={bupt_id:"",class_number:"",email:"",gender:"",id:"",name:"",username:"",usertype:"",phone:"",wechat:""};
 
 class StudentIndex extends React.Component{
    constructor(props){
@@ -21,7 +22,16 @@ class StudentIndex extends React.Component{
         norepeatkey4:true,
         norepeatkey5:true,
         clickmenu:true,//确保是在点击侧边菜单的操作
-        username:"用户名",
+        bupt_id:"",
+        class_number:"",
+        email:"",
+        gender:"",
+        id:"",
+        name:"",
+        phone:"",
+        username:"",
+        usertype:"",
+        wechat:"",
     }
  }
    
@@ -45,7 +55,19 @@ class StudentIndex extends React.Component{
      var that=this;
      getbuptId().then(function(response){
        console.log(response);
-       that.setState({username:response.data.data.username,clickmenu:false})
+       that.setState({
+         bupt_id:response.data.data.bupt_id,
+         class_number:response.data.data.class_number,
+         email:response.data.data.email,
+         gender:response.data.data.gender,
+         id:response.data.data["id"],
+         name:response.data.data["name"],
+         phone:response.data.data.phone,
+         username:response.data.data.username,
+         usertype:response.data.data.usertype,
+         wechat:response.data.data.wechat,
+         clickmenu:false,
+        })
      })
      .catch(function(error){
        console.log(error);
@@ -77,6 +99,16 @@ class StudentIndex extends React.Component{
     render(){
       console.log(localStorage.getItem('token'));
       console.log(window.location)
+      userinformation.bupt_id=this.state.bupt_id;
+      userinformation.class_number=this.state.class_number;
+      userinformation.email=this.state.email;
+      userinformation.gender=this.state.gender;
+      userinformation["id"]=this.state["id"];
+      userinformation["name"]=this.state["name"];
+      userinformation.username=this.state.username;
+      userinformation.phone=this.state.phone;
+      userinformation.usertype=this.state.usertype;
+      userinformation.wechat=this.state.wechat;
       if(this.state.key==1&&this.state.norepeatkey1&&this.state.clickmenu){
         return (<Redirect exact push to='/studentcenter'/>);
        }
@@ -120,10 +152,12 @@ class StudentIndex extends React.Component{
                   <Menu.Item key="5" className="aboutus"><span className="aboutus2" >关于Homework+</span></Menu.Item>
               </Menu>
             </Sider>
-            <Layout style={{ background:'#CCCCCC'}}>
-              <Content style={{ background: '#CCCCCC',paddingLeft: 200,paddingTop:64, margin: 0, minHeight: 280 }}>
+            <Layout style={{ background:'#E6E6E6'}}>
+              <Content style={{ background: '#E6E6E6',paddingLeft: 200,paddingTop:64, margin: 0, minHeight: 280 }}>
                 <Switch>
-                    <Route exact path='/studentcenter' component={Studentcenter}/>
+                    <Route exact path='/studentcenter' render={(props)=>(
+                      <WrappedStudentcenter {...props} userinformation={userinformation}/>
+                    )}/>
                     <Route exact path='/studentcenter/class' render={(props)=>(
                       <Studentclass {...props} color="1"/> //传props
                     )}/>
