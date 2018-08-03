@@ -199,7 +199,7 @@ class Login extends React.Component{
       {getFieldDecorator('用户名', {
       rules: [{required: true, message: '请输入用户名!',whitespace:true}],
       })(
-        <Input placeholder="可以是用户名、手机号或学号" />
+        <Input placeholder="可以是用户名、手机号、学号或邮箱" />
       )}
       </FormItem>
       <FormItem

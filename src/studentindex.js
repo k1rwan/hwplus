@@ -47,14 +47,15 @@ class StudentIndex extends React.Component{
 
    componentDidMount(){
      var getbuptId=axios.create({
-      url:"http://106.14.148.208:8080/data/users/"+localStorage.getItem("userloginKey"),
+      url:"http://106.14.148.208:8080/data/users/"+localStorage.getItem("userloginKey")+"/",
       headers:{"content-type":"application/json","token":localStorage.getItem('token')},
       method:'get',
       timeout:1000,
      })
      var that=this;
      getbuptId().then(function(response){
-       console.log(response);
+       var str=JSON.stringify(response.data.data);
+       localStorage.setItem("user",str);//将对象转换为字符串，这样可以存储在localStorage里
        that.setState({
          bupt_id:response.data.data.bupt_id,
          class_number:response.data.data.class_number,
@@ -94,6 +95,11 @@ class StudentIndex extends React.Component{
 
    changehref=({ item, key, keyPath })=>{
       this.setState({key:key,clickmenu:true,});
+   }
+
+   //修改用户信息
+   changeinformation=(info)=>{
+      this.setState({username:info.username,class_number:info.class_number,phone:info.phone});
    }
   
     render(){
@@ -156,7 +162,7 @@ class StudentIndex extends React.Component{
               <Content style={{ background: '#E6E6E6',paddingLeft: 200,paddingTop:64, margin: 0, minHeight: 280 }}>
                 <Switch>
                     <Route exact path='/studentcenter' render={(props)=>(
-                      <WrappedStudentcenter {...props} userinformation={userinformation}/>
+                      <WrappedStudentcenter {...props} userinformation={userinformation} changeinformation={this.changeinformation}/>
                     )}/>
                     <Route exact path='/studentcenter/class' render={(props)=>(
                       <Studentclass {...props} color="1"/> //传props

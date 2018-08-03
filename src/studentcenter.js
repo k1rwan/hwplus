@@ -3,10 +3,18 @@ import ReactDOM from 'react-dom';
 import './studentcenter.css';
 import { Upload, Icon, message,Row,Col,Button,Modal,Form,Input } from 'antd';
 import axios from 'axios';
-
+var Userlogin={type:'',content:''};
 var pass={old_pass:"",new_pass:""};
 const FormItem = Form.Item;
 var validPassword =/^\w{6,20}$/;
+var validPhone=/^1\d{10}$/;
+var loginUser=axios.create({
+  url:"http://106.14.148.208:8080/data/is_repeated/",
+  headers:{"content-type":"application/json"},
+  method:'post',
+  data:Userlogin,
+  timeout:1000,
+})
 function getBase64(img, callback) {
     const reader = new FileReader();
     reader.addEventListener('load', () => callback(reader.result));
@@ -80,6 +88,10 @@ class Studentcenter extends React.Component{
         visible1:false,
         visible2:false,
         confirmDirty:false,
+        userinformation:this.props.userinformation,
+        username:this.props.userinformation.username,
+        phone:this.props.userinformation.phone,
+        class_number:this.props.userinformation.class_number,
       }
     }
     
@@ -124,19 +136,24 @@ class Studentcenter extends React.Component{
 
      handleSubmit1=(e)=>{
        e.preventDefault();
-       this.props.form.validateFieldsAndScroll((err,values)=>{
+       this.props.form.validateFieldsAndScroll(["原密码","新的密码","再次确认"],(err,values)=>{
           if(!err){
               pass.old_pass=values.原密码;
               pass.new_pass=values.新的密码;
               var changePass=axios.create({
-                url:"http://106.14.148.208:8080/account/change_password/",
+                url:"http://106.14.148.208:8088/account/change_password/",
                 headers:{"content-type":"application/json","token":localStorage.getItem('token')},
                 method:'post',
                 data:pass,
                 timeout:1000,
               })
               changePass().then(function(response){
-                message.success('密码修改成功!',3);
+                if(response.data.result.code==1000){
+                  message.success('密码修改成功!',3);
+                }else if(response.data.result.code==4040){
+                  message.error('密码修改失败，可能是由于您的原密码不符',3);
+                }
+                console.log(response)
               })
               .catch(function(error){
                 message.error('密码修改失败，可能是由于您的原密码不符',3);
@@ -145,6 +162,87 @@ class Studentcenter extends React.Component{
           }
        });
      }
+
+     validateUsername=(rule,value,callback)=>{
+      if(value){
+      const form=this.props.form;
+      Userlogin.type="username";
+      Userlogin.content=form.getFieldValue('用户名');
+      loginUser().then(function(response){
+        if(response.data.data.repeat){
+          callback('该用户名已被注册!');
+        }else{
+          callback();
+        }
+      })
+      .catch(function(error){
+        console.log(error);
+      });
+      }else{callback();}
+    }
+
+    checkVaildPhone=(rule,value,callback)=>{
+      if(value){
+      const form=this.props.form;
+      Userlogin.type="phone";
+      Userlogin.content=form.getFieldValue('手机号');
+      if(value&&!validPhone.test(value)){
+        callback('您的手机号格式不正确!');
+      }
+      loginUser().then(function(response){
+        if(response.data.data.repeat){
+          callback('该手机号已被注册!');
+        }else{
+          callback();
+        }
+      }
+       )      
+      .catch(function(error){
+        console.log(error);
+      });
+      }else{callback();}
+    }
+
+    handleSubmit2=(e)=>{
+      e.preventDefault();
+      this.props.form.validateFieldsAndScroll(["用户名","班级号","手机号"],(err,values)=>{
+         if(!err){
+             let str=localStorage.getItem("user")
+             var user=JSON.parse(str)//字符串转换为对象
+             var changeuserinformation=axios.create({
+               url:"http://106.14.148.208:8080/data/users/"+localStorage.getItem("userloginKey")+"/",
+               headers:{"content-type":"application/json","token":localStorage.getItem('token')},
+               method:'put',
+               data:user,
+               timeout:1000,
+             })
+             if(values.用户名){
+               user.username=values.用户名;
+             }
+             if(values.班级号){
+               user.class_number=values.班级号;
+             }
+             if(values.手机号){
+               user.phone=values.手机号;
+             }
+             var that=this;
+             if(values.用户名||values.班级号||values.手机号){
+             changeuserinformation().then(function(response){
+               that.setState({username:user.username,
+               class_number:user.class_number,
+               phone:user.phone
+              })
+              that.props.changeinformation(user);
+               message.success('用户信息修改成功!',3);
+             })
+             .catch(function(error){
+               message.error('用户信息修改失败!',3);
+             })
+            }
+             this.setState({visible2:false});
+         }
+      });
+    }
 
     render(){
       const { getFieldDecorator } = this.props.form;
@@ -170,6 +268,7 @@ class Studentcenter extends React.Component{
           },
         },
       };
+      const tips='您只需填自己想要变更的某个信息，不用把所有信息全填满'
         return(
             //背景以后会有专门的壁纸
             <div>
@@ -177,20 +276,26 @@ class Studentcenter extends React.Component{
               <Row>
                 <Col xs={24} sm={6}>
                    <div className='uploadavatar'>
-                   <UploadAvatar userinformation={this.props.userinformation} />
+                   <UploadAvatar userinformation={this.state.userinformation} />
                    </div>
                 </Col>
                 <Col xs={24} sm={6}>
                    <div style={{"font-size":"16px","margin-top":"30px",position:"relative"}}>
                    用户名
                    <span style={{ "margin-left":"20px","border-style":"solid","border-width":"thin","padding-left":30,"padding-right":30,"border-color":"#AAAAAA"}}>
-                   {this.props.userinformation.username}
+                   {this.state.userinformation.username}
+                   </span>
+                   </div>
+                   <div style={{"font-size":"16px","margin-top":"30px",position:"relative"}}>
+                   真实姓名
+                   <span style={{ "margin-left":"20px","border-style":"solid","border-width":"thin","padding-left":30,"padding-right":30,"border-color":"#AAAAAA"}}>
+                   {this.state.userinformation["name"]}
                    </span>
                    </div>
                    <div style={{"font-size":"16px","margin-top":"30px",position:"relative"}}>
                    班级
                    <span style={{ "margin-left":"20px","border-style":"solid","border-width":"thin","padding-left":30,"padding-right":30,"border-color":"#AAAAAA"}}>
-                   {this.props.userinformation.class_number}
+                   {this.state.userinformation.class_number}
                    </span>
                    </div>
                 </Col>
@@ -198,19 +303,19 @@ class Studentcenter extends React.Component{
                    <div style={{"font-size":"16px","margin-top":"30px",position:"relative"}}>
                    学号
                    <span style={{ "margin-left":"20px","border-style":"solid","border-width":"thin","padding-left":30,"padding-right":30,"border-color":"#AAAAAA"}}>
-                   {this.props.userinformation.bupt_id}
+                   {this.state.userinformation.bupt_id}
                    </span>
                    </div>
                    <div style={{"font-size":"16px","margin-top":"30px",position:"relative"}}>
                    邮箱
                    <span style={{ "margin-left":"20px","border-style":"solid","border-width":"thin","padding-left":30,"padding-right":30,"border-color":"#AAAAAA"}}>
-                   {this.props.userinformation.email}
+                   {this.state.userinformation.email}
                    </span>
                    </div>
                    <div style={{"font-size":"16px","margin-top":"30px",position:"relative"}}>
                    手机号
                    <span style={{ "margin-left":"20px","border-style":"solid","border-width":"thin","padding-left":30,"padding-right":30,"border-color":"#AAAAAA"}}>
-                   {this.props.userinformation.phone}
+                   {this.state.userinformation.phone}
                    </span>
                    </div>
                 </Col>
@@ -268,6 +373,59 @@ class Studentcenter extends React.Component{
                 )}
                 </FormItem>
                 <FormItem {...tailFormItemLayout}>
+                   <Button type="primary" htmlType="submit" className="submit2" >确认</Button>
+                </FormItem>
+              </Form>
+            </Modal>
+            <Modal
+               title="变更信息"
+               visible={this.state.visible2}
+               footer={null}
+               onCancel={this.handleCancel2}
+               destroyOnClose={true}
+            >
+              <Form onSubmit={this.handleSubmit2}>
+                 <FormItem
+                   {...formItemLayout}
+                   label="新的用户名"
+                 >
+                  {getFieldDecorator('用户名', {
+                   rules: [{
+                   whitespace:true
+                   }, {
+                   validator: this.validateUsername,
+                   }],
+                  })(
+                  <Input />
+                  )}
+                 </FormItem>
+                 <FormItem
+                   {...formItemLayout}
+                   label="新的班级号"
+                 >
+                  {getFieldDecorator('班级号', {
+                   rules: [{
+                   whitespace:true
+                   }],
+                  })(
+                  <Input />
+                  )}
+                 </FormItem>
+                 <FormItem
+                   {...formItemLayout}
+                   label="新的手机号"
+                 >
+                  {getFieldDecorator('手机号', {
+                   rules: [{
+                   whitespace:true
+                   }, {
+                   validator: this.checkVaildPhone,
+                   }],
+                  })(
+                  <Input />
+                  )}
+                 </FormItem>
+                 <FormItem {...tailFormItemLayout} help={tips}>
                    <Button type="primary" htmlType="submit" className="submit2" >确认</Button>
                 </FormItem>
               </Form>
