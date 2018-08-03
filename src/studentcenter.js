@@ -57,7 +57,7 @@ class UploadAvatar extends React.Component {
     render() {
       const uploadButton = (
         <div>
-          <Icon type={this.state.loading ? "loading" : "plus" }/>
+          <Icon type={this.state.loading ? "loading" : "plus" } style={{fontSize:"45px"}}/>
           <div>添加头像</div>
         </div>
       );
