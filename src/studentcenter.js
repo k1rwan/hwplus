@@ -1,10 +1,14 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
 import './studentcenter.css';
-import { Upload, Icon, message,Row,Col,Button,Modal,Form,Input } from 'antd';
+import { Upload, Icon, message,Row,Col,Button,Modal,Form,Input ,Card} from 'antd';
 import axios from 'axios';
+var wxQRcode;//微信二维码
+var avatarFile;//头像文件
+var courseRow=[];//课程班列表
 var Userlogin={type:'',content:''};
 var pass={old_pass:"",new_pass:""};
+var count=0;//玄学计数，用在下面的render，别问我为什么
 const FormItem = Form.Item;
 var validPassword =/^\w{6,20}$/;
 var validPhone=/^1\d{10}$/;
@@ -47,6 +51,7 @@ class UploadAvatar extends React.Component {
         return;
       }
       if (info.file.status === 'done') {
+        avatarFile=info.file;
         getBase64(info.file.originFileObj, imageUrl => this.setState({
           imageUrl,
           loading: false,
@@ -70,10 +75,10 @@ class UploadAvatar extends React.Component {
           className="avatar-uploader"
           showUploadList={false}
           action="http://106.14.148.208:8080/data/avatars/"
-          data={{"user":this.props.userinformation["id"]}}
           headers={{"content-type":"application/json","token":localStorage.getItem('token')}}
           beforeUpload={beforeUpload}
           onChange={this.handleChange}
+          data={{user:this.props.userinformation["id"],useravatar:avatarFile}}
         >
           {imageUrl ? <img src={imageUrl} alt="头像" /> : uploadButton}
         </Upload>
@@ -95,6 +100,26 @@ class Studentcenter extends React.Component{
       }
     }
     
+    componentWillMount(){
+      let str=localStorage.getItem("user")
+      let user=JSON.parse(str)
+      this.setState({wxQRcode:"http://106.14.148.208:8080/data/users/"+user["id"]+"/"});
+      var getUserCourse=axios.create({
+        url:"http://106.14.148.208:8080/data/user_with_course/student/"+user['id']+"/",
+        headers:{"content-type":"application/json","token":localStorage.getItem('token')},
+        method:'get',
+        timeout:1000,
+      })
+      var that=this;
+      getUserCourse().then(function(response){
+        //获得该用户拥有的所有的课程版的ID
+        that.setState({studentCourse:response.data.students_course});
+      })
+      .catch(function(error){
+        console.log(error);
+      });
+    }
+
     showModal1=()=>{
       this.setState({visible1:true});
     }
@@ -245,6 +270,7 @@ class Studentcenter extends React.Component{
     }
 
     render(){
+      console.log(this.state.studentCourse)
       const { getFieldDecorator } = this.props.form;
       const formItemLayout = {
         labelCol: {
@@ -269,6 +295,35 @@ class Studentcenter extends React.Component{
         },
       };
       const tips='您只需填自己想要变更的某个信息，不用把所有信息全填满'
+      const gridStyle={
+        width:'100%',
+        textAlign:'center',
+      }
+      if(count>1){
+      var courselength=this.state.studentCourse.length;
+      console.log(courselength);
+      for(let i=0;i<courselength;i++){
+        var getCourseInfo=axios.create({
+          url:"http://106.14.148.208:8080/data/courses/"+this.state.studentCourse[i]+"/",
+          headers:{"content-type":"application/json","token":localStorage.getItem('token')},
+          method:'get',
+          timeout:1000,
+        })
+        getCourseInfo().then(function(response){
+          console.log(response);
+          courseRow.push(
+            <Card.Grid key={response.data.id} style={gridStyle}>
+              {response.data.name}
+            </Card.Grid>
+          );
+        })
+        .catch(function(error){
+          console.log(error);
+        })
+      }
+    }
+    count++;
+    console.log(courseRow)
         return(
             //背景以后会有专门的壁纸
             <div>
@@ -325,6 +380,16 @@ class Studentcenter extends React.Component{
                    <Button style={{"margin-top":"15px"}} onClick={this.showModal2}>变更信息</Button>
                 </Col>
               </Row>
+              <Row>
+                <Col xs={24} sm={6} offset={6}>
+                   <div style={{"font-size":"16px","margin-top":"30px",position:"relative"}}>
+                    已加入课程班
+                   </div>
+                   <Card style={{width:400}} hoverable="true">
+                       {courseRow}
+                   </Card>
+                </Col>
+              </Row>  
             </div>
             <Modal
               title="修改密码"

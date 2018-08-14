@@ -8,7 +8,7 @@ import WrappedStudentcenter from './studentcenter.js'
 import Studentclass from './studentclass.js'
 
 const { SubMenu } = Menu;
-const { Header, Content, Sider } = Layout;
+const { Header, Content, Sider,Footer } = Layout;
 var userinformation={bupt_id:"",class_number:"",email:"",gender:"",id:"",name:"",username:"",usertype:"",phone:"",wechat:""};
 
 class StudentIndex extends React.Component{
@@ -103,8 +103,6 @@ class StudentIndex extends React.Component{
    }
   
     render(){
-      console.log(localStorage.getItem('token'));
-      console.log(window.location)
       userinformation.bupt_id=this.state.bupt_id;
       userinformation.class_number=this.state.class_number;
       userinformation.email=this.state.email;
@@ -123,25 +121,7 @@ class StudentIndex extends React.Component{
       }
       //后续随着路径的添加而增加
         return(
-          <Layout>
-          <Header  className="header" style={{marginLeft:'200px',zIndex:1,position:'fixed',width:'100%',background:'#fff'}}>
-          <div className="logo">Homework+</div>
-            <Menu
-              theme="light"
-              mode="horizontal"
-              style={{ lineHeight: '64px' }}
-            >
-            <Row>
-             <Col xs={10} sm={24}>
-             <div className="avatar">
-             <Button className="info">5通知</Button>
-             <a><Badge count={5} ><Avatar shape="circle" icon="user" size="large" /></Badge></a>
-             <Tag className="username" color="geekblue">{this.state.username}</Tag>
-             </div>
-             </Col>
-            </Row>
-            </Menu>
-          </Header>
+          <div>
           <Layout>
             <Sider style={{overflow: 'auto', height: '100vh', position: 'fixed', left: 0 ,top:'64px',background:'#fff' }}>
               <Menu
@@ -158,8 +138,27 @@ class StudentIndex extends React.Component{
                   <Menu.Item key="5" className="aboutus"><span className="aboutus2" >关于Homework+</span></Menu.Item>
               </Menu>
             </Sider>
-            <Layout style={{ background:'#E6E6E6'}}>
-              <Content style={{ background: '#E6E6E6',paddingLeft: 200,paddingTop:64, margin: 0, minHeight: 280 }}>
+          </Layout>
+          <Layout style={{ background:'#E6E6E6'}}>
+            <Header  className="header" style={{marginLeft:'200px',zIndex:1,position:'fixed',width:'100%',background:'#fff'}}>
+              <div className="logo">Homework+</div>
+            <Menu
+              theme="light"
+              mode="horizontal"
+              style={{ lineHeight: '64px' }}
+            >
+            <Row>
+             <Col xs={10} sm={24}>
+             <div className="avatar">
+             <Button className="info">5通知</Button>
+             <a><Badge count={5} ><Avatar shape="circle" icon="user" size="large" /></Badge></a>
+             <Tag className="username" color="geekblue">{this.state.username}</Tag>
+             </div>
+             </Col>
+            </Row>
+            </Menu>
+            </Header>
+            <Content style={{ background: '#E6E6E6',paddingLeft: 200,paddingTop:64, margin: 0, minHeight: 280 }}>
                 <Switch>
                     <Route exact path='/studentcenter' render={(props)=>(
                       <WrappedStudentcenter {...props} userinformation={userinformation} changeinformation={this.changeinformation}/>
@@ -168,10 +167,10 @@ class StudentIndex extends React.Component{
                       <Studentclass {...props} color="1"/> //传props
                     )}/>
                 </Switch>
-              </Content>
+            </Content>
+            <Footer style={{background:'#E6E6E6'}}>Footer</Footer>
             </Layout>
-          </Layout>
-        </Layout>
+           </div>
         )
     }
 }
