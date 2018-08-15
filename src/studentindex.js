@@ -6,6 +6,7 @@ import axios from 'axios';
 import {Route,Switch,Link,HashRouter,BrowserRouter,Redirect} from 'react-router-dom';
 import WrappedStudentcenter from './studentcenter.js'
 import Studentclass from './studentclass.js'
+import {_} from 'underscore'
 
 const { SubMenu } = Menu;
 const { Header, Content, Sider,Footer } = Layout;
@@ -73,6 +74,21 @@ class StudentIndex extends React.Component{
      .catch(function(error){
        console.log(error);
      })
+      this.getCourse=setInterval(()=>{
+      var getUserCourse=axios.create({
+        url:"http://106.14.148.208:8080/data/user_with_course/student/"+that.state["id"]+"/",
+        headers:{"content-type":"application/json","token":localStorage.getItem('token')},
+        method:'get',
+        timeout:1000,
+      })
+      getUserCourse().then(function(response){
+        //获得该用户拥有的所有的课程版的ID
+        that.setState({studentCourse:response.data.students_course});
+      })
+      .catch(function(error){
+        console.log(error);
+      });
+     },1000)
    }
 
    componentDidUpdate(){
@@ -91,6 +107,15 @@ class StudentIndex extends React.Component{
     if(this.state.key==5&&this.state.norepeatkey5){
       this.setState({norepeatkey1:true,norepeatkey2:true,norepeatkey3:true,norepeatkey4:true,norepeatkey5:false,});
      }
+   }
+
+    shouldComponentUpdate(nextProps,nextState){
+      if(_.isEqual(nextState,this.state)){return false;}//用underscore的方法深度比较对象
+      else return true;
+    }
+
+   componentWillUnmount(){
+     clearInterval(this.getCourse);
    }
 
    changehref=({ item, key, keyPath })=>{
@@ -161,7 +186,10 @@ class StudentIndex extends React.Component{
             <Content style={{ background: '#E6E6E6',paddingLeft: 200,paddingTop:64, margin: 0, minHeight: 280 }}>
                 <Switch>
                     <Route exact path='/studentcenter' render={(props)=>(
-                      <WrappedStudentcenter {...props} userinformation={userinformation} changeinformation={this.changeinformation}/>
+                      <WrappedStudentcenter {...props} 
+                       userinformation={userinformation}
+                       changeinformation={this.changeinformation}
+                       studentCourse={this.state.studentCourse}/>
                     )}/>
                     <Route exact path='/studentcenter/class' render={(props)=>(
                       <Studentclass {...props} color="1"/> //传props

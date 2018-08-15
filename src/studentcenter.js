@@ -5,10 +5,8 @@ import { Upload, Icon, message,Row,Col,Button,Modal,Form,Input ,Card} from 'antd
 import axios from 'axios';
 var wxQRcode;//微信二维码
 var avatarFile;//头像文件
-var courseRow=[];//课程班列表
 var Userlogin={type:'',content:''};
 var pass={old_pass:"",new_pass:""};
-var count=0;//玄学计数，用在下面的render，别问我为什么
 const FormItem = Form.Item;
 var validPassword =/^\w{6,20}$/;
 var validPhone=/^1\d{10}$/;
@@ -97,27 +95,19 @@ class Studentcenter extends React.Component{
         username:this.props.userinformation.username,
         phone:this.props.userinformation.phone,
         class_number:this.props.userinformation.class_number,
+        studentCourse:this.props.studentCourse===undefined?[-1]:this.props.studentCourse,//课程ID列表
       }
     }
     
-    componentWillMount(){
+    componentDidMount(){
       let str=localStorage.getItem("user")
       let user=JSON.parse(str)
       this.setState({wxQRcode:"http://106.14.148.208:8080/data/users/"+user["id"]+"/"});
-      var getUserCourse=axios.create({
-        url:"http://106.14.148.208:8080/data/user_with_course/student/"+user['id']+"/",
-        headers:{"content-type":"application/json","token":localStorage.getItem('token')},
-        method:'get',
-        timeout:1000,
-      })
-      var that=this;
-      getUserCourse().then(function(response){
-        //获得该用户拥有的所有的课程版的ID
-        that.setState({studentCourse:response.data.students_course});
-      })
-      .catch(function(error){
-        console.log(error);
-      });
+    }
+
+    componentWillReceiveProps(nextProps){
+      console.log(nextProps);
+      this.setState({studentCourse:nextProps.studentCourse===undefined?[-1]:nextProps.studentCourse});
     }
 
     showModal1=()=>{
@@ -299,18 +289,15 @@ class Studentcenter extends React.Component{
         width:'100%',
         textAlign:'center',
       }
-      if(count>1){
-      var courselength=this.state.studentCourse.length;
-      console.log(courselength);
-      for(let i=0;i<courselength;i++){
+      var courseRow=[];//学生的课程列表
+      for(let i=0;i<this.state.studentCourse.length;i++){
         var getCourseInfo=axios.create({
           url:"http://106.14.148.208:8080/data/courses/"+this.state.studentCourse[i]+"/",
           headers:{"content-type":"application/json","token":localStorage.getItem('token')},
           method:'get',
           timeout:1000,
-        })
+         })
         getCourseInfo().then(function(response){
-          console.log(response);
           courseRow.push(
             <Card.Grid key={response.data.id} style={gridStyle}>
               {response.data.name}
@@ -320,10 +307,8 @@ class Studentcenter extends React.Component{
         .catch(function(error){
           console.log(error);
         })
-      }
-    }
-    count++;
-    console.log(courseRow)
+      }  
+      console.log(courseRow);
         return(
             //背景以后会有专门的壁纸
             <div>
@@ -386,7 +371,7 @@ class Studentcenter extends React.Component{
                     已加入课程班
                    </div>
                    <Card style={{width:400}} hoverable="true">
-                       {courseRow}
+                     {courseRow}
                    </Card>
                 </Col>
               </Row>  
