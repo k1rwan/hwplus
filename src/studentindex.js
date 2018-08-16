@@ -33,6 +33,7 @@ class StudentIndex extends React.Component{
         username:"",
         usertype:"",
         wechat:"",
+        courselist:[],//学生加入的课程班信息，为一个数组，数组里面的每个元素均为单个课程班的信息
     }
  }
    
@@ -47,6 +48,10 @@ class StudentIndex extends React.Component{
    }
 
    componentDidMount(){
+    const gridStyle={
+      width:'100%',
+      textAlign:'center',
+    }
      var getbuptId=axios.create({
       url:"http://106.14.148.208:8080/data/users/"+localStorage.getItem("userloginKey")+"/",
       headers:{"content-type":"application/json","token":localStorage.getItem('token')},
@@ -74,6 +79,7 @@ class StudentIndex extends React.Component{
      .catch(function(error){
        console.log(error);
      })
+      var lastUpdatestudentcourse=[];
       this.getCourse=setInterval(()=>{
       var getUserCourse=axios.create({
         url:"http://106.14.148.208:8080/data/user_with_course/student/"+that.state["id"]+"/",
@@ -83,7 +89,30 @@ class StudentIndex extends React.Component{
       })
       getUserCourse().then(function(response){
         //获得该用户拥有的所有的课程版的ID
-        that.setState({studentCourse:response.data.students_course});
+        if(JSON.stringify(lastUpdatestudentcourse)!==JSON.stringify(response.data.students_course)){
+          lastUpdatestudentcourse=response.data.students_course;
+          var courselist2=[];
+          for(let i=0;i<lastUpdatestudentcourse.length;i++){
+            var getCourseInfo=axios.create({
+              url:"http://106.14.148.208:8080/data/courses/"+lastUpdatestudentcourse[i]+"/",
+              headers:{"content-type":"application/json","token":localStorage.getItem('token')},
+              method:'get',
+              timeout:1000,
+             })
+            getCourseInfo().then(function(response2){
+              courselist2[i]=response2.data,
+              that.setState({
+                courselist: courselist2,
+               })
+               console.log(response2.data)
+               console.log(that.state.courselist)
+            })
+            .catch(function(error2){
+              console.log(error2);
+            })
+          } 
+          //that.setState({studentCourse:response.data.students_course});
+        }
       })
       .catch(function(error){
         console.log(error);
@@ -189,7 +218,9 @@ class StudentIndex extends React.Component{
                       <WrappedStudentcenter {...props} 
                        userinformation={userinformation}
                        changeinformation={this.changeinformation}
-                       studentCourse={this.state.studentCourse}/>
+                       courselist={this.state.courselist}
+                       //studentCourse={this.state.studentCourse}
+                       />
                     )}/>
                     <Route exact path='/studentcenter/class' render={(props)=>(
                       <Studentclass {...props} color="1"/> //传props
