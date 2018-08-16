@@ -3,7 +3,6 @@ import ReactDOM from 'react-dom';
 import './studentcenter.css';
 import { Upload, Icon, message,Row,Col,Button,Modal,Form,Input ,Card} from 'antd';
 import axios from 'axios';
-import { TIMEOUT } from 'dns';
 var wxQRcode;//微信二维码
 var avatarFile;//头像文件
 var courseRow=[];//学生的课程列表
