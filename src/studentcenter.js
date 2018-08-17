@@ -3,9 +3,11 @@ import ReactDOM from 'react-dom';
 import './studentcenter.css';
 import { Upload, Icon, message,Row,Col,Button,Modal,Form,Input ,Card} from 'antd';
 import axios from 'axios';
+import {_} from 'underscore'
 var wxQRcode;//微信二维码
 var avatarFile;//头像文件
 var courseRow=[];//学生的课程列表
+var courseIDrow=[];//学生的课程列表ID，防止重复
 var Userlogin={type:'',content:''};
 var pass={old_pass:"",new_pass:""};
 const FormItem = Form.Item;
@@ -96,7 +98,6 @@ class Studentcenter extends React.Component{
         username:this.props.userinformation.username,
         phone:this.props.userinformation.phone,
         class_number:this.props.userinformation.class_number,
-        //studentCourse:this.props.studentCourse===undefined?[-1]:this.props.studentCourse,//课程ID列表
       }
     }
     
@@ -111,46 +112,18 @@ class Studentcenter extends React.Component{
         width:'100%',
         textAlign:'center',
       }
-      console.log(nextProps);
       console.log(nextProps.courselist["length"])
-      if(JSON.stringify(nextProps.courselist)!==JSON.stringify(this.props.courselist)){
         for(let i in nextProps.courselist){
+              if(_.indexOf(courseIDrow,nextProps.courselist[i]["id"])===-1){
+              courseIDrow.push(nextProps.courselist[i]["id"]);
               courseRow.push(
                 <Card.Grid key={nextProps.courselist[i]["id"]} style={gridStyle}>
                    {nextProps.courselist[i]["name"]} 
                 </Card.Grid>
               )
+              } 
         }
-      }
-      //this.setState({studentCourse:nextProps.studentCourse===undefined?[-1]:nextProps.studentCourse});
     }
-
-    // componentWillUpdate(nextProps,nextState){
-      //courseRow=[];
-      //const gridStyle={
-      //  width:'100%',
-      //  textAlign:'center',
-      //}
-      //for(let i=0;i<nextState.studentCourse.length;i++){
-      //  var getCourseInfo=axios.create({
-      //    url:"http://106.14.148.208:8080/data/courses/"+nextState.studentCourse[i]+"/",
-      //    headers:{"content-type":"application/json","token":localStorage.getItem('token')},
-      //    method:'get',
-      //    timeout:1000,
-      //   })
-      //  getCourseInfo().then(function(response){
-       //   courseRow.push(
-       //     <Card.Grid key={response.data.id} style={gridStyle}>
-        //      {response.data.name}
-        //    </Card.Grid>
-       //   );
-       // })
-       // .catch(function(error){
-       //   console.log(error);
-       // })
-     // } 
-      //console.log("done") 
-   // }
 
     showModal1=()=>{
       this.setState({visible1:true});
@@ -302,7 +275,6 @@ class Studentcenter extends React.Component{
     }
 
     render(){
-      //console.log(this.state.studentCourse)
       const { getFieldDecorator } = this.props.form;
       const formItemLayout = {
         labelCol: {
@@ -327,7 +299,6 @@ class Studentcenter extends React.Component{
         },
       };
       const tips='您只需填自己想要变更的某个信息，不用把所有信息全填满'
-      console.log(courseRow);
         return(
             //背景以后会有专门的壁纸
             <div>

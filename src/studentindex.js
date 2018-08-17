@@ -100,18 +100,14 @@ class StudentIndex extends React.Component{
               timeout:1000,
              })
             getCourseInfo().then(function(response2){
-              courselist2[i]=response2.data,
-              that.setState({
-                courselist: courselist2,
-               })
-               console.log(response2.data)
-               console.log(that.state.courselist)
+              courselist2[i]=response2.data;
+              that.setState({courselist: courselist2});
+              console.log(that.state.courselist);
             })
             .catch(function(error2){
               console.log(error2);
             })
-          } 
-          //that.setState({studentCourse:response.data.students_course});
+          }          
         }
       })
       .catch(function(error){
@@ -119,7 +115,7 @@ class StudentIndex extends React.Component{
       });
      },1000)
    }
-
+   
    componentDidUpdate(){
     if(this.state.key==1&&this.state.norepeatkey1){
       this.setState({norepeatkey1:false,norepeatkey2:true,norepeatkey3:true,norepeatkey4:true,norepeatkey5:true,});
@@ -137,11 +133,6 @@ class StudentIndex extends React.Component{
       this.setState({norepeatkey1:true,norepeatkey2:true,norepeatkey3:true,norepeatkey4:true,norepeatkey5:false,});
      }
    }
-
-    shouldComponentUpdate(nextProps,nextState){
-      if(_.isEqual(nextState,this.state)){return false;}//用underscore的方法深度比较对象
-      else return true;
-    }
 
    componentWillUnmount(){
      clearInterval(this.getCourse);
