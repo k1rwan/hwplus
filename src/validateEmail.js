@@ -9,7 +9,7 @@ class ValidateEmail extends React.Component{
        if(gotToken===''){
            gotToken=re.exec(window.location.href)[2];
            var postToken=axios.create({
-            url:"http://106.14.148.208:8088/account/activate/",
+            url:"http://homeworkplus.cn/account/activate/",
             headers:{"content-type":"application/json","token":gotToken},
             method:'post',
             timeout:1000,

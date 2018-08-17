@@ -53,7 +53,7 @@ class StudentIndex extends React.Component{
       textAlign:'center',
     }
      var getbuptId=axios.create({
-      url:"http://106.14.148.208:8080/data/users/"+localStorage.getItem("userloginKey")+"/",
+      url:"http://homeworkplus.cn/data/users/"+localStorage.getItem("userloginKey")+"/",
       headers:{"content-type":"application/json","token":localStorage.getItem('token')},
       method:'get',
       timeout:1000,
@@ -82,7 +82,7 @@ class StudentIndex extends React.Component{
       var lastUpdatestudentcourse=[];
       this.getCourse=setInterval(()=>{
       var getUserCourse=axios.create({
-        url:"http://106.14.148.208:8080/data/user_with_course/student/"+that.state["id"]+"/",
+        url:"http://homeworkplus.cn/data/user_with_course/student/"+that.state["id"]+"/",
         headers:{"content-type":"application/json","token":localStorage.getItem('token')},
         method:'get',
         timeout:1000,
@@ -94,7 +94,7 @@ class StudentIndex extends React.Component{
           var courselist2=[];
           for(let i=0;i<lastUpdatestudentcourse.length;i++){
             var getCourseInfo=axios.create({
-              url:"http://106.14.148.208:8080/data/courses/"+lastUpdatestudentcourse[i]+"/",
+              url:"http://homeworkplus.cn/data/courses/"+lastUpdatestudentcourse[i]+"/",
               headers:{"content-type":"application/json","token":localStorage.getItem('token')},
               method:'get',
               timeout:1000,

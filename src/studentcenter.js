@@ -14,7 +14,7 @@ const FormItem = Form.Item;
 var validPassword =/^\w{6,20}$/;
 var validPhone=/^1\d{10}$/;
 var loginUser=axios.create({
-  url:"http://106.14.148.208:8080/data/is_repeated/",
+  url:"http://homeworkplus.cn/data/is_repeated/",
   headers:{"content-type":"application/json"},
   method:'post',
   data:Userlogin,
@@ -75,7 +75,7 @@ class UploadAvatar extends React.Component {
           listType="picture-card"
           className="avatar-uploader"
           showUploadList={false}
-          action="http://106.14.148.208:8080/data/avatars/"
+          action="http://homeworkplus.cn/data/avatars/"
           headers={{"content-type":"application/json","token":localStorage.getItem('token')}}
           beforeUpload={beforeUpload}
           onChange={this.handleChange}
@@ -104,7 +104,7 @@ class Studentcenter extends React.Component{
     componentDidMount(){
       let str=localStorage.getItem("user")
       let user=JSON.parse(str)
-      this.setState({wxQRcode:"http://106.14.148.208:8080/data/users/"+user["id"]+"/"});
+      this.setState({wxQRcode:"http://homeworkplus.cn/data/users/"+user["id"]+"/"});
     }
 
     componentWillReceiveProps(nextProps){
@@ -171,7 +171,7 @@ class Studentcenter extends React.Component{
               pass.old_pass=values.原密码;
               pass.new_pass=values.新的密码;
               var changePass=axios.create({
-                url:"http://106.14.148.208:8088/account/change_password/",
+                url:"http://homeworkplus.cn/account/change_password/",
                 headers:{"content-type":"application/json","token":localStorage.getItem('token')},
                 method:'post',
                 data:pass,
@@ -240,7 +240,7 @@ class Studentcenter extends React.Component{
              let str=localStorage.getItem("user")
              var user=JSON.parse(str)//字符串转换为对象
              var changeuserinformation=axios.create({
-               url:"http://106.14.148.208:8080/data/users/"+localStorage.getItem("userloginKey")+"/",
+               url:"http://homeworkplus.cn/data/users/"+localStorage.getItem("userloginKey")+"/",
                headers:{"content-type":"application/json","token":localStorage.getItem('token')},
                method:'put',
                data:user,

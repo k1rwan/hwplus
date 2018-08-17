@@ -22,7 +22,7 @@ class ModifyPassword extends React.Component{
         if(gotToken===''){
             gotToken=re.exec(window.location.href)[2];
             var confirm=axios.create({
-             url:"http://106.14.148.208:8088/account/confirm_forgotten/",
+             url:"http://homeworkplus.cn/account/confirm_forgotten/",
              headers:{"content-type":"application/json","token":gotToken},
              method:'post',
              timeout:1000,
@@ -72,7 +72,7 @@ class ModifyPassword extends React.Component{
           if (!err) {
             password.new_pass=values.密码;
             var changePassword=axios.create({
-                url:"http://106.14.148.208:8088/account/change_directly/",
+                url:"http://homeworkplus.cn/account/change_directly/",
                 headers:{"content-type":"application/json","token":gotToken},
                 data:password,
                 method:'post',
