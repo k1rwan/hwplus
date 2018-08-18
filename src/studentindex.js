@@ -6,6 +6,7 @@ import axios from 'axios';
 import {Route,Switch,Link,HashRouter,BrowserRouter,Redirect} from 'react-router-dom';
 import WrappedStudentcenter from './studentcenter.js'
 import Studentclass from './studentclass.js'
+import Specificclass from './studentspecificclass.js'
 import {_} from 'underscore'
 
 const { SubMenu } = Menu;
@@ -16,7 +17,7 @@ class StudentIndex extends React.Component{
    constructor(props){
     super(props);
     this.state={
-        key:1,
+        key:1,//当前状态下菜单的key
         norepeatkey1:true,
         norepeatkey2:true,
         norepeatkey3:true,
@@ -102,7 +103,6 @@ class StudentIndex extends React.Component{
             getCourseInfo().then(function(response2){
               courselist2[i]=response2.data;
               that.setState({courselist: courselist2});
-              console.log(that.state.courselist);
             })
             .catch(function(error2){
               console.log(error2);
@@ -117,19 +117,19 @@ class StudentIndex extends React.Component{
    }
    
    componentDidUpdate(){
-    if(this.state.key==1&&this.state.norepeatkey1){
+    if(this.state.key==1&&this.state.norepeatkey1&&this.state.clickmenu){
       this.setState({norepeatkey1:false,norepeatkey2:true,norepeatkey3:true,norepeatkey4:true,norepeatkey5:true,});
      }
-    if(this.state.key==2&&this.state.norepeatkey2){
+    if(this.state.key==2&&this.state.norepeatkey2&&this.state.clickmenu){
      this.setState({norepeatkey1:true,norepeatkey2:false,norepeatkey3:true,norepeatkey4:true,norepeatkey5:true,});
     }
-    if(this.state.key==3&&this.state.norepeatkey3){
+    if(this.state.key==3&&this.state.norepeatkey3&&this.state.clickmenu){
       this.setState({norepeatkey1:true,norepeatkey2:true,norepeatkey3:false,norepeatkey4:true,norepeatkey5:true,});
      }
-    if(this.state.key==4&&this.state.norepeatkey4){
+    if(this.state.key==4&&this.state.norepeatkey4&&this.state.clickmenu){
      this.setState({norepeatkey1:true,norepeatkey2:true,norepeatkey3:true,norepeatkey4:false,norepeatkey5:true,});
     }
-    if(this.state.key==5&&this.state.norepeatkey5){
+    if(this.state.key==5&&this.state.norepeatkey5&&this.state.clickmenu){
       this.setState({norepeatkey1:true,norepeatkey2:true,norepeatkey3:true,norepeatkey4:true,norepeatkey5:false,});
      }
    }
@@ -147,6 +147,11 @@ class StudentIndex extends React.Component{
       this.setState({username:info.username,class_number:info.class_number,phone:info.phone});
    }
   
+   //对studentcenter里面课程班管理的跳转操作进行反应
+   redirecttocourse=(e)=>{
+     this.setState({key:2,clickmenu:false,norepeatkey1:true,norepeatkey3:true,norepeatkey4:true,norepeatkey5:true,})
+   }
+
     render(){
       userinformation.bupt_id=this.state.bupt_id;
       userinformation.class_number=this.state.class_number;
@@ -210,11 +215,17 @@ class StudentIndex extends React.Component{
                        userinformation={userinformation}
                        changeinformation={this.changeinformation}
                        courselist={this.state.courselist}
-                       //studentCourse={this.state.studentCourse}
+                       redirecttocourse={this.redirecttocourse}
                        />
                     )}/>
                     <Route exact path='/studentcenter/class' render={(props)=>(
-                      <Studentclass {...props} color="1"/> //传props
+                      <Studentclass {...props}
+                        userinformation={userinformation}
+                        courselist={this.state.courselist}
+                      /> 
+                    )}/>
+                    <Route path='/studentcenter/class/:courseID' render={(props)=>(
+                      <Specificclass {...props}/>
                     )}/>
                 </Switch>
             </Content>

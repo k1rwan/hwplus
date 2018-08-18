@@ -2,8 +2,10 @@ import React from 'react';
 import ReactDOM from 'react-dom';
 import './studentcenter.css';
 import { Upload, Icon, message,Row,Col,Button,Modal,Form,Input ,Card} from 'antd';
+import {Link} from 'react-router-dom';
 import axios from 'axios';
 import {_} from 'underscore'
+import {moment} from 'moment'
 var wxQRcode;//微信二维码
 var avatarFile;//头像文件
 var courseRow=[];//学生的课程列表
@@ -112,16 +114,29 @@ class Studentcenter extends React.Component{
         width:'100%',
         textAlign:'center',
       }
-      console.log(nextProps.courselist["length"])
         for(let i in nextProps.courselist){
               if(_.indexOf(courseIDrow,nextProps.courselist[i]["id"])===-1){
               courseIDrow.push(nextProps.courselist[i]["id"]);
+              if(courseIDrow.length<=3){
               courseRow.push(
                 <Card.Grid key={nextProps.courselist[i]["id"]} style={gridStyle}>
-                   {nextProps.courselist[i]["name"]} 
+                <Link to={'/studentcenter/class/'+nextProps.courselist[i]["id"]+'/'} 
+                style={{color:"black"}}
+                onClick={this.props.redirecttocourse}
+                >   
+                {nextProps.courselist[i]["name"]}
+                </Link>
                 </Card.Grid>
               )
-              } 
+              }
+              else{
+                courseRow.push(
+                  <Card.Grid key="-1" style={gridStyle}>
+                     ......
+                  </Card.Grid>
+                )
+              }
+          } 
         }
     }
 
