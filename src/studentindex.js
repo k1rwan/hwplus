@@ -12,6 +12,7 @@ import {_} from 'underscore'
 const { SubMenu } = Menu;
 const { Header, Content, Sider,Footer } = Layout;
 var userinformation={bupt_id:"",class_number:"",email:"",gender:"",id:"",name:"",username:"",usertype:"",phone:"",wechat:""};
+var assistantindex=0;//assistantRow的下标
 
 class StudentIndex extends React.Component{
    constructor(props){
@@ -35,6 +36,7 @@ class StudentIndex extends React.Component{
         usertype:"",
         wechat:"",
         courselist:[],//学生加入的课程班信息，为一个数组，数组里面的每个元素均为单个课程班的信息
+        assistantRow:[],//所有的课程助教名字列表，为一个数组，数组里面的每个元素均为单个课程的助教列表
     }
  }
    
@@ -102,7 +104,27 @@ class StudentIndex extends React.Component{
              })
             getCourseInfo().then(function(response2){
               courselist2[i]=response2.data;
-              that.setState({courselist: courselist2});
+              var assistantRow2=[];
+              console.log(response2.data.teaching_assistants)
+              for(let assistantname in response2.data.teaching_assistants){
+              //获取助教的名字
+                var getassistantinformation=axios.create({
+                    url:"http://homeworkplus.cn/data/users/"+response2.data.teaching_assistants[assistantname]+'/',
+                    headers:{"content-type":"application/json","token":localStorage.getItem('token')},
+                    method:'get',
+                    timeout:1000,
+                })
+                getassistantinformation().then(function(response3){
+                    assistantRow2[assistantindex]=response3.data.data["name"];
+                    assistantindex++;
+                    console.log(response3.data)
+                    console.log(assistantRow2)
+                    that.setState({assistantRow: assistantRow2,courselist: courselist2});
+                })
+                .catch(function(error){
+                  console.log(error);
+                }) 
+              }
             })
             .catch(function(error2){
               console.log(error2);
@@ -222,6 +244,7 @@ class StudentIndex extends React.Component{
                       <Studentclass {...props}
                         userinformation={userinformation}
                         courselist={this.state.courselist}
+                        assistantRow={this.state.assistantRow}
                       /> 
                     )}/>
                     <Route path='/studentcenter/class/:courseID' render={(props)=>(
