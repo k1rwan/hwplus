@@ -95,6 +95,7 @@ class Studentcenter extends React.Component{
       this.state={
         visible1:false,
         visible2:false,
+        visible3:false,
         confirmDirty:false,
         userinformation:this.props.userinformation,
         username:this.props.userinformation.username,
@@ -131,8 +132,8 @@ class Studentcenter extends React.Component{
               }
               else{
                 courseRow.push(
-                  <Card.Grid key="-1" style={gridStyle}>
-                     ......
+                  <Card.Grid key="-1" style={gridStyle} onClick={this.showModal3}>
+                    <span style={{color:"#2B91D5"}}> 更多课程......</span>
                   </Card.Grid>
                 )
               }
@@ -148,12 +149,20 @@ class Studentcenter extends React.Component{
       this.setState({visible2:true});
     }
 
+    showModal3=()=>{
+      this.setState({visible3:true});
+    }
+
     handleCancel1=()=>{
       this.setState({visible1:false});
     }
 
     handleCancel2=()=>{
       this.setState({visible2:false});
+    }
+
+    handleCancel3=()=>{
+      this.setState({visible3:false});
     }
 
     handleConfirmBlur = (e) => {
@@ -484,6 +493,14 @@ class Studentcenter extends React.Component{
                    <Button type="primary" htmlType="submit" className="submit2" >确认</Button>
                 </FormItem>
               </Form>
+            </Modal>
+            <Modal
+              title="课程班管理"
+              visible={this.state.visible3}
+              footer={null}
+              onCancel={this.handleCancel3}
+            >
+
             </Modal>
             </div>
         )

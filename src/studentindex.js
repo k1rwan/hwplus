@@ -12,7 +12,6 @@ import {_} from 'underscore'
 const { SubMenu } = Menu;
 const { Header, Content, Sider,Footer } = Layout;
 var userinformation={bupt_id:"",class_number:"",email:"",gender:"",id:"",name:"",username:"",usertype:"",phone:"",wechat:""};
-var assistantindex=0;//assistantRow的下标
 
 class StudentIndex extends React.Component{
    constructor(props){
@@ -95,6 +94,8 @@ class StudentIndex extends React.Component{
         if(JSON.stringify(lastUpdatestudentcourse)!==JSON.stringify(response.data.students_course)){
           lastUpdatestudentcourse=response.data.students_course;
           var courselist2=[];
+          var assistantRow2=[];
+          var teacherRow2=[];
           for(let i=0;i<lastUpdatestudentcourse.length;i++){
             var getCourseInfo=axios.create({
               url:"http://homeworkplus.cn/data/courses/"+lastUpdatestudentcourse[i]+"/",
@@ -104,8 +105,8 @@ class StudentIndex extends React.Component{
              })
             getCourseInfo().then(function(response2){
               courselist2[i]=response2.data;
-              var assistantRow2=[];
-              console.log(response2.data.teaching_assistants)
+              var eachclassassistant=[];//单个课程的助教名字列表
+              var eachclassteacher=[];//单个课程的教师名字列表
               for(let assistantname in response2.data.teaching_assistants){
               //获取助教的名字
                 var getassistantinformation=axios.create({
@@ -115,21 +116,35 @@ class StudentIndex extends React.Component{
                     timeout:1000,
                 })
                 getassistantinformation().then(function(response3){
-                    assistantRow2[assistantindex]=response3.data.data["name"];
-                    assistantindex++;
-                    console.log(response3.data)
-                    console.log(assistantRow2)
-                    that.setState({assistantRow: assistantRow2,courselist: courselist2});
+                    eachclassassistant[assistantname]=response3.data.data["name"];
                 })
                 .catch(function(error){
                   console.log(error);
                 }) 
               }
+              for(let teachername in response2.data.teachers){
+                //获取教师的名字
+                  var getassistantinformation=axios.create({
+                      url:"http://homeworkplus.cn/data/users/"+response2.data.teachers[teachername]+'/',
+                      headers:{"content-type":"application/json","token":localStorage.getItem('token')},
+                      method:'get',
+                      timeout:1000,
+                  })
+                  getassistantinformation().then(function(response3){
+                      eachclassteacher[teachername]=response3.data.data["name"];
+                  })
+                  .catch(function(error){
+                    console.log(error);
+                  }) 
+                }
+              assistantRow2[i]=eachclassassistant;
+              teacherRow2[i]=eachclassteacher;
+              that.setState({courselist:courselist2,assistantRow:assistantRow2,teacherRow:teacherRow2});
             })
             .catch(function(error2){
               console.log(error2);
             })
-          }          
+          }      
         }
       })
       .catch(function(error){
@@ -245,6 +260,7 @@ class StudentIndex extends React.Component{
                         userinformation={userinformation}
                         courselist={this.state.courselist}
                         assistantRow={this.state.assistantRow}
+                        teacherRow={this.state.teacherRow}
                       /> 
                     )}/>
                     <Route path='/studentcenter/class/:courseID' render={(props)=>(
