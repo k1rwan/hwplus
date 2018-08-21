@@ -38,7 +38,7 @@ class Query(object):
     get_users_by_ids = graphene.List(UserType, ids=graphene.List(of_type=graphene.Int))
 
     all_courses = graphene.List(CourseType)
-    get_course_by_id = graphene.Field(CourseType, id=graphene.Int())
+    get_courses_by_ids = graphene.Field(CourseType, ids=graphene.List(of_type=graphene.Int))
     search_courses_by_keywords = graphene.List(CourseType, keywords=graphene.String())
     search_courses_by_name = graphene.List(CourseType, name=graphene.String())
     search_courses_by_teacher_name = graphene.List(CourseType, teacher_name=graphene.String())
@@ -55,8 +55,11 @@ class Query(object):
     def resolve_all_courses(self, info, **kwargs):
         return models.HWFCourseClass.objects.all()
 
-    def resolve_get_course_by_id(self, info, **kwargs):
-        return models.HWFCourseClass.objects.get(pk=kwargs['id'])
+    def resolve_get_courses_by_ids(self, info, **kwargs):
+        result = models.models.Q(pk=None)
+        for item in kwargs['ids']:
+            result = result | models.models.Q(pk=item)
+        return models.HWFCourseClass.objects.filter(result)
 
     def resolve_search_courses_by_keywords(self, info, **kwargs):
         result = models.models.Q(pk=None)

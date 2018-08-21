@@ -20,9 +20,11 @@ from django.urls import path
 from graphene_django.views import GraphQLView
 from project.schema import schema
 
+from data.safe_gql_view import BetterGraphQLView
+
 urlpatterns = [
     path('admin/', admin.site.urls),
 	url(r'^api-auth/', include('rest_framework.urls')),
     url(r'^',include('data.urls')),
-    path('graphql/', GraphQLView.as_view(graphiql=True, schema=schema))
+    path('graphql/', BetterGraphQLView.as_view(graphiql=True, schema=schema))
 ]
