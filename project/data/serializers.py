@@ -3,6 +3,8 @@ from rest_framework import serializers
 from data import models
 from data.models import User
 
+from data.encrypt import getHash
+
 # class HWFUserProfileSerializer(serializers.ModelSerializer):
 
 #     class Meta:
@@ -16,12 +18,13 @@ class UserSerializer(serializers.ModelSerializer):
     class_number = serializers.CharField(required=False)
     is_active = serializers.BooleanField(read_only=True, required=False)
     date_joined = serializers.DateTimeField(read_only=True, required=False)
+    wechat = serializers.CharField(required=False)
 
     def create(self, validated_data):
         vd = validated_data
         print(vd)
         username, password, email, phone, name, wechat, usertype, gender = vd['username'], vd[
-            'password'], vd['email'], vd['phone'], vd['name'], vd['wechat'], vd['usertype'], vd['gender']
+            'password'], vd['email'], vd['phone'], vd['name'], getHash(vd['wechat']), vd['usertype'], vd['gender']
         user = None
         try:
             bupt_id = vd['bupt_id']
@@ -47,7 +50,7 @@ class UserSerializerCourse(UserSerializer):
     class Meta:
         model = User
         fields = ('id', 'username', 'students_course',
-                  'creator_course', 'teaching_assistants_course')
+                  'teachers_course', 'teaching_assistants_course')
         read_only_fields = ('id', 'username')
 
 
@@ -63,7 +66,7 @@ class UserSerializerCourseForTeacher(UserSerializerCourse):
 
     class Meta:
         model = User
-        fields = ('id', 'username', 'creator_course')
+        fields = ('id', 'username', 'teachers_course')
         read_only_fields = ('id', 'username')
 
 
@@ -74,6 +77,12 @@ class UserSerializerCourseForAssistant(UserSerializerCourse):
         fields = ('id', 'username', 'teaching_assistants_course')
         read_only_fields = ('id', 'username')
 
+
+class UserAvatarSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = models.UserAvatar
+        fields = '__all__'
 
 class HWFCourseClassSerializer(serializers.ModelSerializer):
 

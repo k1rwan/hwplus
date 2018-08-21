@@ -8,6 +8,8 @@ from rest_framework.response import Response
 from data.models import User
 from data.user_views import token
 
+from data import encrypt
+
 
 # basic class
 class SelfEditUserAppendUserRead(permissions.BasePermission):
@@ -15,9 +17,18 @@ class SelfEditUserAppendUserRead(permissions.BasePermission):
     def has_permission(self, request, view):
         if request.method in permissions.SAFE_METHODS:
             return True
-        vtoken = request.META['HTTP_TOKEN']
-        if token.confirm_validate_token(vtoken):
-            return True
+        try:
+            vtoken = request.META['HTTP_TOKEN']
+            if token.confirm_validate_token(vtoken):
+                return True
+        except:
+            openid = request.data['openid']
+            hs = encrypt.getHash(openid)
+            try:
+                User.objects.get(wechat=hs)
+                return True
+            except:
+                return False
         return False
 
 # basic class
@@ -28,9 +39,18 @@ class SelfEditTeacherAppendUserRead(SelfEditUserAppendUserRead):
     def has_permission(self, request, view):
         if request.method in permissions.SAFE_METHODS:
             return True
-        vtoken = request.META['HTTP_TOKEN']
-        if User.objects.get(username=token.confirm_validate_token(vtoken)).usertype == 'teacher':
-            return True
+        try:
+            vtoken = request.META['HTTP_TOKEN']
+            if User.objects.get(username=token.confirm_validate_token(vtoken)).usertype == 'teacher':
+                return True
+        except:
+            openid = request.data['openid']
+            hs = encrypt.getHash(openid)
+            try:
+                if User.objects.get(wechat=hs).usertype == 'teacher':
+                    return True
+            except:
+                return False
         return False
 
 # derived
@@ -41,9 +61,19 @@ class SelfEditTeacherAppendUserReadForHWFCourseClass(SelfEditTeacherAppendUserRe
     def has_object_permission(self, request, view, obj):
         if request.method in permissions.SAFE_METHODS:
             return True
-        vtoken = request.META['HTTP_TOKEN']
-        if token.confirm_validate_token(vtoken) == User.objects.get(pk=obj.creator_id).username:
-            return True
+        try:
+            vtoken = request.META['HTTP_TOKEN']
+            realuser = User.objects.get(username=token.confirm_validate_token(vtoken))
+            teacher_list = obj.teachers
+            if realuser.pk in teacher_list:
+                return True
+        except:
+            openid = request.data['openid']
+            hs = encrypt.getHash(openid)
+            realuser = User.objects.get(wechat=hs)
+            teacher_list = obj.teachers
+            if realuser.pk in teacher_list:
+                return True
         return False
 
 
@@ -55,10 +85,21 @@ class SelfEditUserReadForHWFCourseClass(permissions.BasePermission):
         return False
 
     def has_object_permission(self, request, view, obj):
+        if request.method in permissions.SAFE_METHODS:
+            return True
         if request.method != 'PUT':
             return False
         else:
-            vtoken = request.META['HTTP_TOKEN']
-            if token.confirm_validate_token(vtoken) == User.objects.get(username=obj.username).username:
-                return True
+            try:
+                vtoken = request.META['HTTP_TOKEN']
+                if token.confirm_validate_token(vtoken) == User.objects.get(username=obj.username).username:
+                    return True
+            except:
+                openid = request.data['openid']
+                hs = encrypt.getHash(openid)
+                try:
+                    if hs == User.objects.get(pk=obj.pk).wechat:
+                        return True
+                except:
+                    return False
             return False

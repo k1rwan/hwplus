@@ -1,6 +1,5 @@
 # Create your views here.
 import re
-
 import qrcode
 from itsdangerous import SignatureExpired
 from rest_framework import status, viewsets
@@ -10,7 +9,7 @@ from rest_framework.response import Response
 from data import models, permissions, serializers
 from data.confirm import ShortToken, Token, send
 from data.models import User
-from project.settings import API_AUTH_KEY, SECRET_KEY
+from project.settings import API_AUTH_KEY, SECRET_KEY, FRONTEND_DOMAIN, BACKEND_DOMIAN
 
 token = Token(SECRET_KEY.encode())
 short_token = ShortToken(SECRET_KEY.encode())
@@ -52,10 +51,17 @@ def init():
 
 @api_view(['POST'])
 def get_qrcode(request):
-    qr = qrcode.make(request.data['content'])
-    qr.save("./data/backend_media/invitation_qr/ppp.jpg")
-    return Response(data={"qrcode":"http://localhost:8000/media/invitation_qr/ppp.jpg"})
+    qr = qrcode.make("http://"+BACKEND_DOMIAN+"/data/courses/"+str(request.data['course_id']))
+    name = short_token.generate_validate_token(str(request.data['course_id']))
+    qr.save("./data/backend_media/invitation_qr/"+name+".jpg")
+    return Response(data={"qrcode":"http://"+BACKEND_DOMIAN+"/media/invitation_qr/"+name+".jpg","vtk":name})
 
+@api_view(['POST'])
+def bind_wechat(request):
+    qr = qrcode.make("http://"+BACKEND_DOMIAN+"data/users/"+str(request.data['user_id']))
+    name = short_token.generate_validate_token(str(request.data['user_id']))
+    qr.save("./data/backend_media/bind_qr/"+name+".jpg")
+    return Response(data={"qrcode":"http://"+BACKEND_DOMIAN+"/media/bind_qr/"+name+".jpg","vtk":name})
 
 class HWFFileViewSet(viewsets.ModelViewSet):
     queryset = models.HWFFile.objects.all()

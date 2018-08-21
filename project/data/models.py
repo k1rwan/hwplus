@@ -27,27 +27,30 @@ class User(AbstractUser):
     usertype = models.CharField(max_length=20, choices=[(item, item) for item in [
                                 'student', 'teacher', 'assistant']], default='student')
     class_number = models.CharField(max_length=10, default='noClass')
-    wechat = models.TextField(default='')
+    wechat = models.TextField(null=True)
     forgotten = models.BooleanField(default=False)
+
+class UserAvatar(models.Model):
+    user = models.ManyToManyField(User,related_name='useravatar')
     url_height = models.PositiveIntegerField(default=75)
     url_width = models.PositiveIntegerField(default=75)
     useravatar = models.ImageField(
         upload_to="avatars", height_field='url_height', width_field='url_width', null=True)
 
-
 class HWFCourseClass(models.Model):
     name = models.TextField()
     description = models.TextField()
     marks = models.FloatField(default=0.0)
-    creator = models.ForeignKey(
-        User, on_delete=models.PROTECT, related_name='creator_course')
+    teachers = models.ManyToManyField(
+        User, related_name='teachers_course', null=True, blank=True
+        )
     teaching_assistants = models.ManyToManyField(
-        User, related_name='teaching_assistants_course', null=True, default=[])
-    # student_representatives = models.ManyToManyField(User, related_name='student_representatives_course')
+        User, related_name='teaching_assistants_course', null=True, blank=True
+        )
     students = models.ManyToManyField(
-        User, related_name='students_course', null=True, default=[])
-    join_code = models.TextField(max_length=512, null=True)
-
+        User, related_name='students_course', null=True, blank=True
+        )
+    
     def __str__(self):
         return self.name
 

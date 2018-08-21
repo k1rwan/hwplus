@@ -39,6 +39,7 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'rest_framework',
+    'graphene_django',
     'data',
     'corsheaders',
 ]
@@ -191,4 +192,4 @@ CORS_EXPOSE_HEADERS=(
 )
 
 FRONTEND_DOMAIN = "localhost:3000"
-BACKEND_DOMIAN = "106.14.148.208:8088"
+BACKEND_DOMIAN = "homeworkplus.cn"

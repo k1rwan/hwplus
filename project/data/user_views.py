@@ -6,7 +6,7 @@ from rest_framework import status, viewsets
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
 
-from data import serializers
+from data import encrypt, models, serializers
 from data.confirm import ShortToken, Token, send, send_forget
 from data.models import User
 from project.settings import API_AUTH_KEY, SECRET_KEY
@@ -56,10 +56,25 @@ def login(request):
     init()
     global token, data, headers
     try:
-        from_username = request.data['username']
-        from_password = request.data['password']
+        try:
+            from_username = request.data['username']
+            from_password = request.data['password']
+        except:
+            openid = request.data['openid']
+            hs = encrypt.getHash(openid)
+            print(hs)
+            realuser = User.objects.get(wechat=hs)
+            if realuser.is_active == False:
+                data['result'] = results['INACTIVE']
+                return Response(data=data, headers=headers)
+            serializer = serializers.UserSerializer(realuser)
+            data['data'] = {key: serializer.data[key]
+                            for key in serializer.data if key != 'password'}
+            data['result'] = results['SUCCESS']
+            return Response(data=data, headers=headers)
+
     except:
-        return Response(data=data, headers=headers, status=status.HTTP_400_BAD_REQUEST)
+        return Response(data=data, headers=headers)
     try:
         realuser = User.objects.get(bupt_id=from_username)
     except:
@@ -79,7 +94,7 @@ def login(request):
             data['result'] = results['INACTIVE']
             return Response(data=data, headers=headers)
         serializer = serializers.UserSerializer(realuser)
-        validate_token = token.generate_validate_token(from_username)
+        validate_token = token.generate_validate_token(realuser.username)
         headers['token'] = validate_token
         data['data'] = {key: serializer.data[key]
                         for key in serializer.data if key != 'password'}
@@ -98,21 +113,49 @@ def user_list(request):
     global token, data, headers
     # 用户列表接口
     if request.method == 'GET':
+        # queryset = User.objects.all()
+        # try:
+        #     keywords = request.query_params['keywords']
+        #     queryset = [obj for obj in queryset if keywords in obj.username or keywords in obj.bupt_id or keywords in obj.name or keywords in obj.email or keywords in obj.phone or keywords in obj.wechat or keywords in obj.class_number]
+        # except:
+        #     pass
+        # serializer = serializers.UserSerializer(
+        #     queryset, many=True)
+        # data['data'] = serializer.data
+        # data['result'] = results['SUCCESS']
+        # return Response(data=data, headers=headers)
         try:
-            # 只有登录了才能看哦
-            if token.confirm_validate_token(request.META['HTTP_TOKEN']):
-                headers['isLogin'] = True
-                headers['authed'] = True
-                queryset = User.objects.all()
-                try:
-                    keywords = request.query_params['keywords']
-                    queryset = [obj for obj in queryset if keywords in obj.username or keywords in obj.bupt_id or keywords in obj.name or keywords in obj.email or keywords in obj.phone or keywords in obj.wechat or keywords in obj.class_number]
-                except:
-                    pass
-                serializer = serializers.UserSerializer(queryset, many=True)
-                data['data'] = serializer.data
-                data['result'] = results['SUCCESS']
-                return Response(data=data, headers=headers)
+            try:
+                # 只有登录了才能看哦
+                if token.confirm_validate_token(request.META['HTTP_TOKEN']):
+                    headers['isLogin'] = True
+                    headers['authed'] = True
+                    queryset = User.objects.all()
+                    try:
+                        keywords = request.query_params['keywords']
+                        queryset = [obj for obj in queryset if keywords in obj.username or keywords in obj.bupt_id or keywords in obj.name or keywords in obj.email or keywords in obj.phone or keywords in obj.wechat or keywords in obj.class_number]
+                    except:
+                        pass
+                    serializer = serializers.UserSerializer(
+                        queryset, many=True)
+                    data['data'] = serializer.data
+                    data['result'] = results['SUCCESS']
+                    return Response(data=data, headers=headers)
+            except:
+                openid = request.data['openid']
+                hs = encrypt.getHash(openid)
+                if User.objects.get(wechat=hs):
+                    queryset = User.objects.all()
+                    try:
+                        keywords = request.query_params['keywords']
+                        queryset = [obj for obj in queryset if keywords in obj.username or keywords in obj.bupt_id or keywords in obj.name or keywords in obj.email or keywords in obj.phone or keywords in obj.wechat or keywords in obj.class_number]
+                    except:
+                        pass
+                    serializer = serializers.UserSerializer(
+                        queryset, many=True)
+                    data['data'] = serializer.data
+                    data['result'] = results['SUCCESS']
+                    return Response(data=data, headers=headers)
         except:
             data['result'] = results['EXPIRED']
             headers['expired'] = True
@@ -132,6 +175,7 @@ def user_list(request):
     }
     # 注册接口
     if request.method == 'POST':
+        request.data['useravatar'] = [2,]
         serializer = serializers.UserSerializer(data=request.data)
         if serializer.is_valid():
             serializer.save()
@@ -155,40 +199,71 @@ def user_detail(request, pk):
             try:
                 user = User.objects.get(bupt_id=pk)
             except:
-                return Response(data=data, headers=headers, status=status.HTTP_404_NOT_FOUND)
+                try:
+                    user = User.objects.get(wechat=pk)
+                except:
+                    return Response(data=data, headers=headers, status=status.HTTP_404_NOT_FOUND)
     # 获取单个用户信息接口
     # 登录才能看哦
     if request.method == 'GET':
         try:
-            token.confirm_validate_token(request.META['HTTP_TOKEN'])
-            headers['isLogin'] = True
-            headers['authed'] = True
-            serializer = serializers.UserSerializer(user)
-            data['data'] = serializer.data
-            data['result'] = results['SUCCESS']
-            return Response(data=data, headers=headers)
-        except SignatureExpired as e:
-            print(e)
-            data['result'] = results['EXPIRED']
-            headers['expired'] = True
-            return Response(headers=headers, data=data)
+            try:
+                token.confirm_validate_token(request.META['HTTP_TOKEN'])
+                headers['isLogin'] = True
+                headers['authed'] = True
+                serializer = serializers.UserSerializer(user)
+                data['data'] = serializer.data
+                data['result'] = results['SUCCESS']
+                return Response(data=data, headers=headers)
+            except:
+                openid = request.data['openid']
+                hs = encrypt.getHash(openid)
+                User.objects.get(wechat=hs)
+                headers['isLogin'] = True
+                headers['authed'] = True
+                serializer = serializers.UserSerializer(user)
+                data['data'] = serializer.data
+                data['result'] = results['SUCCESS']
+                return Response(data=data, headers=headers)
+        except:
+            try:
+                found_user = User.objects.get(pk=pk)
+                serializer = serializers.UserSerializer(found_user)
+                data['data'] = serializer.data
+                data['result'] = results['SUCCESS']
+                return Response(data=data, headers=headers)
+            except:
+                data['result'] = results['EXPIRED']
+                headers['expired'] = True
+                return Response(headers=headers, data=data)
         else:
             return Response(data=data, headers=headers, status=status.HTTP_403_FORBIDDEN)
     # 修改用户信息接口
     # 只有自己才能改哦
     elif request.method == 'PUT':
         try:
-            plain = token.confirm_validate_token(request.META['HTTP_TOKEN'])
             try:
-                found_user = User.objects.get(bupt_id=plain)
+                plain = token.confirm_validate_token(
+                    request.META['HTTP_TOKEN'])
             except:
+                openid = request.data['openid']
+                found_user = User.objects.get(pk=pk)
+                found_user.wechat = encrypt.getHash(openid)
+                found_user.save()
+                data['result'] = results['SUCCESS']
+                data['data'] = serializers.UserSerializer(found_user).data
+                return Response(data=data,headers=headers)
+            else:
                 try:
-                    found_user = User.objects.get(phone=plain)
+                    found_user = User.objects.get(bupt_id=plain)
                 except:
                     try:
-                        found_user = User.objects.get(username=plain)
+                        found_user = User.objects.get(phone=plain)
                     except:
-                        return Response(data=data, headers=headers, status=status.HTTP_404_NOT_FOUND)
+                        try:
+                            found_user = User.objects.get(username=plain)
+                        except:
+                            return Response(data=data, headers=headers, status=status.HTTP_404_NOT_FOUND)
         except SignatureExpired as e:
             data['result'] = results['EXPIRED']
             headers['expired'] = True
@@ -231,6 +306,8 @@ def activate(request):
         user_obj.is_active = True
         user_obj.save()
         data['result'] = results['SUCCESS']
+        serializer = serializers.UserSerializer(user_obj)
+        data['data'] = serializer.data
         return Response(data=data, headers=headers)
     else:
         data['result'] = results['EXPIRED']
@@ -243,11 +320,16 @@ def change_password(request):
     global data, headers, token
     vtoken = request.META['HTTP_TOKEN']
     username = token.confirm_validate_token(vtoken)
-    realuser = User.objects.get(username=username)
+    try:
+        realuser = User.objects.get(username=username)
+    except:
+        return Response(data=data, headers=headers, status=status.HTTP_404_NOT_FOUND)
     if realuser.check_password(request.data['old_pass']):
         realuser.set_password(request.data['new_pass'])
         realuser.save()
         data['result'] = results['SUCCESS']
+        serializer = serializers.UserSerializer(realuser)
+        data['data'] = serializer.data
         return Response(data=data, headers=headers)
     else:
         data['result'] = results['PWD_ERR']
@@ -263,20 +345,14 @@ def forget_password(request):
     try:
         realuser = User.objects.get(username=requser)
     except:
-        try:
-            realuser = User.objects.get(bupt_id=requser)
-        except:
-            try:
-                realuser = User.objects.get(phone=requser)
-            except:
-                try:
-                    realuser = User.objects.get(email=requser)
-                except:
-                    return Response(data=data, headers=headers, status=status.HTTP_404_NOT_FOUND)
+        return Response(data=data, headers=headers, status=status.HTTP_404_NOT_FOUND)
 
     send_forget(realuser)
     data['result'] = results['SUCCESS']
+    serializer = serializers.UserSerializer(realuser)
+    data['data'] = serializer.data
     return Response(data=data, headers=headers)
+
 
 @api_view(['POST'])
 def confirm_forgotten(request):
@@ -288,11 +364,12 @@ def confirm_forgotten(request):
         user_obj.forgotten = True
         user_obj.save()
         data['result'] = results['SUCCESS']
-        serializer=serializers.UserSerializer(user_obj)
-        data['data']=serializer.data
+        serializer = serializers.UserSerializer(user_obj)
+        data['data'] = serializer.data
         return Response(data=data, headers=headers)
     data['result'] = results['EXPIRED']
     return Response(data=data, headers=headers)
+
 
 @api_view(['POST'])
 def directly_change(request):
@@ -306,5 +383,19 @@ def directly_change(request):
             usrn_obj.forgotten = False
             usrn_obj.save()
             data['result'] = results['SUCCESS']
+            serializer = serializers.UserSerializer(usrn_obj)
+            data['data'] = serializer.data
             return Response(data=data, headers=headers)
     return Response(data=data, headers=headers, status=status.HTTP_403_FORBIDDEN)
+
+
+class UserAvatarViewset(viewsets.ModelViewSet):
+    queryset = models.UserAvatar.objects.all()
+    serializer_class = serializers.UserAvatarSerializer
+
+    def perform_create(self, serializer):
+        vtk = self.request.headers['token']
+        username = token.confirm_validate_token(vtk)
+        user_obj = User.objects.get(username=username)
+        user_id = user_obj.pk
+        serializer.save(user = user_id)
