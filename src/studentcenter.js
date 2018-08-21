@@ -9,6 +9,7 @@ import {moment} from 'moment'
 var wxQRcode;//微信二维码
 var avatarFile;//头像文件
 var courseRow=[];//学生的课程列表
+var allcourseRow=[];//学生所有的课程列表
 var courseIDrow=[];//学生的课程列表ID，防止重复
 var Userlogin={type:'',content:''};
 var pass={old_pass:"",new_pass:""};
@@ -110,36 +111,7 @@ class Studentcenter extends React.Component{
       this.setState({wxQRcode:"http://homeworkplus.cn/data/users/"+user["id"]+"/"});
     }
 
-    componentWillReceiveProps(nextProps){
-      const gridStyle={
-        width:'100%',
-        textAlign:'center',
-      }
-        for(let i in nextProps.courselist){
-              if(_.indexOf(courseIDrow,nextProps.courselist[i]["id"])===-1){
-              courseIDrow.push(nextProps.courselist[i]["id"]);
-              if(courseIDrow.length<=3){
-              courseRow.push(
-                <Card.Grid key={nextProps.courselist[i]["id"]} style={gridStyle}>
-                <Link to={'/studentcenter/class/'+nextProps.courselist[i]["id"]+'/'} 
-                style={{color:"black"}}
-                onClick={this.props.redirecttocourse}
-                >   
-                {nextProps.courselist[i]["name"]}
-                </Link>
-                </Card.Grid>
-              )
-              }
-              else{
-                courseRow.push(
-                  <Card.Grid key="-1" style={gridStyle} onClick={this.showModal3}>
-                    <span style={{color:"#2B91D5"}}> 更多课程......</span>
-                  </Card.Grid>
-                )
-              }
-          } 
-        }
-    }
+
 
     showModal1=()=>{
       this.setState({visible1:true});
@@ -323,6 +295,43 @@ class Studentcenter extends React.Component{
         },
       };
       const tips='您只需填自己想要变更的某个信息，不用把所有信息全填满'
+      const gridStyle={
+        width:'100%',
+        textAlign:'center',
+      }
+      if(this.props.courselist.length<courseIDrow.length){
+           courseIDrow=[];
+           courseRow=[];
+           allcourseRow=[];
+      }
+        for(let i in this.props.courselist){
+              if(_.indexOf(courseIDrow,this.props.courselist[i]["id"])===-1){
+              courseIDrow.push(this.props.courselist[i]["id"]);
+              if(courseIDrow.length<=3){
+              courseRow.push(
+                <Card.Grid key={this.props.courselist[i]["id"]} style={gridStyle}>
+                <Link to={'/studentcenter/class/'+this.props.courselist[i]["id"]+'/'} 
+                style={{color:"black"}}
+                onClick={this.props.redirecttocourse}
+                >   
+                {this.props.courselist[i]["name"]}
+                </Link>
+                </Card.Grid>
+              )
+              }
+              allcourseRow.push(
+                <Card.Grid key={this.props.courselist[i]["id"]} style={gridStyle}>
+                <Link to={'/studentcenter/class/'+this.props.courselist[i]["id"]+'/'} 
+                style={{color:"black"}}
+                onClick={this.props.redirecttocourse}
+                >   
+                {this.props.courselist[i]["name"]}
+                </Link>
+                </Card.Grid>
+              )
+          } 
+        }
+       //console.log(courseRow)
         return(
             //背景以后会有专门的壁纸
             <div>
@@ -386,7 +395,10 @@ class Studentcenter extends React.Component{
                    </div>
                    <Card style={{width:400}} hoverable="true">
                      {courseRow}
-                   </Card>
+                     <Card.Grid key="-1" style={gridStyle} onClick={this.showModal3}>
+                     <span style={{color:"#2B91D5"}}> 更多课程......</span>
+                     </Card.Grid> 
+                     </Card>
                 </Col>
               </Row>  
             </div>
@@ -500,7 +512,9 @@ class Studentcenter extends React.Component{
               footer={null}
               onCancel={this.handleCancel3}
             >
-
+             <Card hoverable="true">
+             {allcourseRow}
+             </Card>
             </Modal>
             </div>
         )

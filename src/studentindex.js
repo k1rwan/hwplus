@@ -253,6 +253,8 @@ class StudentIndex extends React.Component{
                        changeinformation={this.changeinformation}
                        courselist={this.state.courselist}
                        redirecttocourse={this.redirecttocourse}
+                       assistantRow={this.state.assistantRow}
+                       teacherRow={this.state.teacherRow}
                        />
                     )}/>
                     <Route exact path='/studentcenter/class' render={(props)=>(

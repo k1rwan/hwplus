@@ -2,6 +2,7 @@ import React from 'react';
 import ReactDOM from 'react-dom';
 import './studentclass.css';
 import {Row,Col,Button,Card} from'antd'
+import {Link} from 'react-router-dom';
 import axios from 'axios';
 import {_} from 'underscore'
 var classRow=[];//课程班显示在网页卡片上的列表
@@ -12,10 +13,18 @@ class Studentclass extends React.Component{
       console.log(this.props.courselist)
       console.log(this.props.assistantRow)
       console.log(this.props.teacherRow)
-        const gridStyle={
-            width:"33.3%",
-            textAlign:'center',
-        }
+      const gridStyle={
+          width:"33.3%",
+          textAlign:'center',
+      }
+      const gridStyle2={
+        width:"100%",
+        textAlign:'center',
+      }
+      if(this.props.courselist.length<courseIDrow.length){
+           courseIDrow=[];
+           classRow=[];
+      }
       for(let i=0;i<this.props.courselist.length;i++){
         if(_.indexOf(courseIDrow,this.props.courselist[i]["id"])===-1){
           courseIDrow.push(this.props.courselist[i]["id"]);
@@ -48,7 +57,13 @@ class Studentclass extends React.Component{
             } 
             style={{marginLeft:"20px",marginRight:"20px",marginBottom:"20px"}}
             hoverable="true">
-            Card content
+            <Card.Grid style={gridStyle2}>
+            <Link to={'/studentcenter/class/'+this.props.courselist[i]["id"]+'/'} 
+                style={{color:"black"}}
+            > 
+              更多历史作业任务....
+            </Link>
+            </Card.Grid>
             </Card>
             </Col>             
            )
