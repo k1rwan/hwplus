@@ -11,8 +11,6 @@ var courseIDrow=[];//学生的课程列表ID，防止重复
 class Studentclass extends React.Component{
     render(){
       console.log(this.props.courselist)
-      console.log(this.props.assistantRow)
-      console.log(this.props.teacherRow)
       const gridStyle={
           width:"33.3%",
           textAlign:'center',
@@ -30,17 +28,17 @@ class Studentclass extends React.Component{
           courseIDrow.push(this.props.courselist[i]["id"]);
           var courseTeacher=[];
           var courseAssistant=[];
-          for(let j=0;j<this.props.teacherRow[i].length;j++){
+          for(let j=0;j<this.props.courselist[i].teachers.length;j++){
               courseTeacher.push(
                 <span key={j} style={{marginLeft:"5px",marginRight:"5px"}}>
-                    {this.props.teacherRow[i][j]}
+                    {this.props.courselist[i].teachers[j]["name"]}
                 </span>
               )
           }
-          for(let j=0;j<this.props.assistantRow[i].length;j++){
+          for(let j=0;j<this.props.courselist[i].teachingAssistants.length;j++){
             courseAssistant.push(
               <span key={j} style={{marginLeft:"5px",marginRight:"5px"}}>
-                  {this.props.assistantRow[i][j]}
+                  {this.props.courselist[i].teachingAssistants[j]["name"]}
               </span>
             )
           }

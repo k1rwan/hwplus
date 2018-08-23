@@ -9,6 +9,7 @@ import Studentclass from './studentclass.js'
 import Specificclass from './studentspecificclass.js'
 import {_} from 'underscore'
 
+//大多数的地方使用graphql技术获取和传送数据
 const { SubMenu } = Menu;
 const { Header, Content, Sider,Footer } = Layout;
 var userinformation={bupt_id:"",class_number:"",email:"",gender:"",id:"",name:"",username:"",usertype:"",phone:"",wechat:""};
@@ -55,26 +56,43 @@ class StudentIndex extends React.Component{
       textAlign:'center',
     }
      var getbuptId=axios.create({
-      url:"http://homeworkplus.cn/data/users/"+localStorage.getItem("userloginKey")+"/",
-      headers:{"content-type":"application/json","token":localStorage.getItem('token')},
-      method:'get',
+      url:"http://homeworkplus.cn/graphql/",
+      headers:{"content-type":"application/json","token":localStorage.getItem('token'),"Accept":"application/json"},
+      method:'post',
+      data:{
+         "query":`query{
+           getUsersByIds(ids:${localStorage.getItem('userloginKey')})
+           {
+             buptId
+             classNumber
+             email
+             gender
+             id
+             name
+             phone
+             username
+             usertype
+             wechat
+           }
+          }`//用反引号      
+      },
       timeout:1000,
      })
      var that=this;
      getbuptId().then(function(response){
-       var str=JSON.stringify(response.data.data);
+       var str=JSON.stringify(response.data.data.getUsersByIds[0]);
        localStorage.setItem("user",str);//将对象转换为字符串，这样可以存储在localStorage里
        that.setState({
-         bupt_id:response.data.data.bupt_id,
-         class_number:response.data.data.class_number,
-         email:response.data.data.email,
-         gender:response.data.data.gender,
-         id:response.data.data["id"],
-         name:response.data.data["name"],
-         phone:response.data.data.phone,
-         username:response.data.data.username,
-         usertype:response.data.data.usertype,
-         wechat:response.data.data.wechat,
+         bupt_id:response.data.data.getUsersByIds[0].buptId,
+         class_number:response.data.data.getUsersByIds[0].classNumber,
+         email:response.data.data.getUsersByIds[0].email,
+         gender:response.data.data.getUsersByIds[0].gender,
+         id:response.data.data.getUsersByIds[0]["id"],
+         name:response.data.data.getUsersByIds[0]["name"],
+         phone:response.data.data.getUsersByIds[0].phone,
+         username:response.data.data.getUsersByIds[0].username,
+         usertype:response.data.data.getUsersByIds[0].usertype,
+         wechat:response.data.data.getUsersByIds[0].wechat,
          clickmenu:false,
         })
      })
@@ -84,67 +102,44 @@ class StudentIndex extends React.Component{
       var lastUpdatestudentcourse=[];
       this.getCourse=setInterval(()=>{
       var getUserCourse=axios.create({
-        url:"http://homeworkplus.cn/data/user_with_course/student/"+that.state["id"]+"/",
-        headers:{"content-type":"application/json","token":localStorage.getItem('token')},
-        method:'get',
+        url:"http://homeworkplus.cn/graphql/",
+        headers:{"content-type":"application/json","token":localStorage.getItem('token'),"Accept":"application/json"},
+        method:'post',
+        data:{
+          "query":`query{
+            getUsersByIds(ids:${localStorage.getItem('userloginKey')})
+            {
+              studentsCourse{
+                id
+                name
+                description
+                marks
+                school
+                startTime
+                endTime
+                teachers{
+                  id
+                  name
+                }
+                teachingAssistants{
+                  id
+                  name
+                }
+                students{
+                  id
+                  name
+                }
+              }
+            }
+           }`
+        },
         timeout:1000,
       })
       getUserCourse().then(function(response){
         //获得该用户拥有的所有的课程版的ID
-        if(JSON.stringify(lastUpdatestudentcourse)!==JSON.stringify(response.data.students_course)){
-          lastUpdatestudentcourse=response.data.students_course;
-          var courselist2=[];
-          var assistantRow2=[];
-          var teacherRow2=[];
-          for(let i=0;i<lastUpdatestudentcourse.length;i++){
-            var getCourseInfo=axios.create({
-              url:"http://homeworkplus.cn/data/courses/"+lastUpdatestudentcourse[i]+"/",
-              headers:{"content-type":"application/json","token":localStorage.getItem('token')},
-              method:'get',
-              timeout:1000,
-             })
-            getCourseInfo().then(function(response2){
-              courselist2[i]=response2.data;
-              var eachclassassistant=[];//单个课程的助教名字列表
-              var eachclassteacher=[];//单个课程的教师名字列表
-              for(let assistantname in response2.data.teaching_assistants){
-              //获取助教的名字
-                var getassistantinformation=axios.create({
-                    url:"http://homeworkplus.cn/data/users/"+response2.data.teaching_assistants[assistantname]+'/',
-                    headers:{"content-type":"application/json","token":localStorage.getItem('token')},
-                    method:'get',
-                    timeout:1000,
-                })
-                getassistantinformation().then(function(response3){
-                    eachclassassistant[assistantname]=response3.data.data["name"];
-                })
-                .catch(function(error){
-                  console.log(error);
-                }) 
-              }
-              for(let teachername in response2.data.teachers){
-                //获取教师的名字
-                  var getassistantinformation=axios.create({
-                      url:"http://homeworkplus.cn/data/users/"+response2.data.teachers[teachername]+'/',
-                      headers:{"content-type":"application/json","token":localStorage.getItem('token')},
-                      method:'get',
-                      timeout:1000,
-                  })
-                  getassistantinformation().then(function(response3){
-                      eachclassteacher[teachername]=response3.data.data["name"];
-                  })
-                  .catch(function(error){
-                    console.log(error);
-                  }) 
-                }
-              assistantRow2[i]=eachclassassistant;
-              teacherRow2[i]=eachclassteacher;
-              that.setState({courselist:courselist2,assistantRow:assistantRow2,teacherRow:teacherRow2});
-            })
-            .catch(function(error2){
-              console.log(error2);
-            })
-          }      
+        if(JSON.stringify(lastUpdatestudentcourse)!==JSON.stringify(response.data.data.getUsersByIds[0].studentsCourse)){
+          lastUpdatestudentcourse=response.data.data.getUsersByIds[0].studentsCourse;
+          that.setState({courselist:lastUpdatestudentcourse})
         }
       })
       .catch(function(error){
@@ -253,16 +248,12 @@ class StudentIndex extends React.Component{
                        changeinformation={this.changeinformation}
                        courselist={this.state.courselist}
                        redirecttocourse={this.redirecttocourse}
-                       assistantRow={this.state.assistantRow}
-                       teacherRow={this.state.teacherRow}
                        />
                     )}/>
                     <Route exact path='/studentcenter/class' render={(props)=>(
                       <Studentclass {...props}
                         userinformation={userinformation}
                         courselist={this.state.courselist}
-                        assistantRow={this.state.assistantRow}
-                        teacherRow={this.state.teacherRow}
                       /> 
                     )}/>
                     <Route path='/studentcenter/class/:courseID' render={(props)=>(

@@ -111,8 +111,6 @@ class Studentcenter extends React.Component{
       this.setState({wxQRcode:"http://homeworkplus.cn/data/users/"+user["id"]+"/"});
     }
 
-
-
     showModal1=()=>{
       this.setState({visible1:true});
     }
@@ -235,27 +233,48 @@ class Studentcenter extends React.Component{
          if(!err){
              let str=localStorage.getItem("user")
              var user=JSON.parse(str)//字符串转换为对象
+             console.log(user)
+           //  var changeuserinformation=axios.create({
+           //    url:"http://homeworkplus.cn/data/users/"+localStorage.getItem("userloginKey")+"/",
+          //     headers:{"content-type":"application/json","token":localStorage.getItem('token')},
+          //     method:'put',
+          //     data:user,
+          //     timeout:1000,
+          //   })
+          if(values.用户名){
+            user.username=values.用户名;
+          }
+          if(values.班级号){
+            user.classNumber=values.班级号;
+          }
+          if(values.手机号){
+            user.phone=values.手机号;
+          }
              var changeuserinformation=axios.create({
-               url:"http://homeworkplus.cn/data/users/"+localStorage.getItem("userloginKey")+"/",
-               headers:{"content-type":"application/json","token":localStorage.getItem('token')},
-               method:'put',
-               data:user,
-               timeout:1000,
-             })
-             if(values.用户名){
-               user.username=values.用户名;
-             }
-             if(values.班级号){
-               user.class_number=values.班级号;
-             }
-             if(values.手机号){
-               user.phone=values.手机号;
-             }
+              url:"http://homeworkplus.cn/graphql/",
+              headers:{"content-type":"application/json","token":localStorage.getItem('token'),"Accept":"application/json"},
+              method:'post',
+              data:{
+                "query":`mutation{
+                  editUser(
+                    userData:{
+                      id:${localStorage.getItem('userloginKey')},
+                   
+                      classNumber:${user.classNumber}
+                    }
+                  ){
+                    username
+                    phone
+                    classNumber
+                  }`
+              },
+              timeout:1000,
+            })
              var that=this;
              if(values.用户名||values.班级号||values.手机号){
              changeuserinformation().then(function(response){
                that.setState({username:user.username,
-               class_number:user.class_number,
+               class_number:user.classNumber,
                phone:user.phone
               })
               that.props.changeinformation(user);
@@ -271,6 +290,7 @@ class Studentcenter extends React.Component{
     }
 
     render(){
+      console.log(this.props.courselist)
       const { getFieldDecorator } = this.props.form;
       const formItemLayout = {
         labelCol: {
@@ -307,6 +327,14 @@ class Studentcenter extends React.Component{
         for(let i in this.props.courselist){
               if(_.indexOf(courseIDrow,this.props.courselist[i]["id"])===-1){
               courseIDrow.push(this.props.courselist[i]["id"]);
+              var courseTeacher=[];
+              for(let j=0;j<this.props.courselist[i].teachers.length;j++){
+                courseTeacher.push(
+                  <span key={j} style={{marginLeft:"5px",marginRight:"5px"}}>
+                      {this.props.courselist[i].teachers[j]["name"]}
+                  </span>
+                )
+             }
               if(courseIDrow.length<=3){
               courseRow.push(
                 <Card.Grid key={this.props.courselist[i]["id"]} style={gridStyle}>
@@ -314,7 +342,8 @@ class Studentcenter extends React.Component{
                 style={{color:"black"}}
                 onClick={this.props.redirecttocourse}
                 >   
-                {this.props.courselist[i]["name"]}
+                {this.props.courselist[i]["name"]+"    教师:"}
+                {courseTeacher}
                 </Link>
                 </Card.Grid>
               )
@@ -325,13 +354,14 @@ class Studentcenter extends React.Component{
                 style={{color:"black"}}
                 onClick={this.props.redirecttocourse}
                 >   
-                {this.props.courselist[i]["name"]}
+                {this.props.courselist[i]["name"]+"    教师:"}
+                {courseTeacher}
+                {this.props.courselist[i].marks+"学分"}
                 </Link>
                 </Card.Grid>
               )
           } 
         }
-       //console.log(courseRow)
         return(
             //背景以后会有专门的壁纸
             <div>
