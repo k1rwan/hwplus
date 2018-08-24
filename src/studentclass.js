@@ -45,21 +45,29 @@ class Studentclass extends React.Component{
            classRow.push(
             <Col key={this.props.courselist[i]["id"]} xs={24} sm={12}>
             <Card title={
+              <span>
               <Row>
                 <Col xs={12} sm={8}>{this.props.courselist[i]["name"]}</Col>
                 <Col xs={12} sm={8} style={{left:"15%"}}>{this.props.courselist[i].students.length}人</Col>
                 <Col xs={12} sm={8} style={{left:"15%"}}>{this.props.courselist[i].marks}学分</Col>
                 <Col xs={12} sm={8}>教师: {courseTeacher}</Col>
                 <Col xs={12} sm={8} style={{left:"10%"}}>助教: {courseAssistant}</Col>
-              </Row>  
+              </Row>
+              <Row>
+                <Col xs={12} sm={8} >开课学院: {this.props.courselist[i].school}</Col> 
+                <Col xs={12} sm={8} style={{left:"10%"}}>时间: </Col>
+              </Row> 
+              </span>
             } 
             style={{marginLeft:"20px",marginRight:"20px",marginBottom:"20px"}}
             hoverable="true">
             <Card.Grid style={gridStyle2}>
             <Link to={'/studentcenter/class/'+this.props.courselist[i]["id"]+'/'} 
-                style={{color:"black"}}
+                  style={{color:"black"}}
             > 
+              <span style={{fontSize:"25px"}}>
               更多历史作业任务....
+              </span>
             </Link>
             </Card.Grid>
             </Card>

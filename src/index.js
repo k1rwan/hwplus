@@ -21,7 +21,7 @@ var checkLogin=0;//判断是否在正确的入口登录
 var vaildEmail=/^[a-zA-Z0-9_.-]+@[a-zA-Z0-9-]+(\.[a-zA-Z0-9-]+)*\.[a-zA-Z0-9]{2,6}$/;
 var validPhone=/^1\d{10}$/;
 var validPassword =/^\w{6,20}$/;
-var postUser=axios.create({
+var enrollUser=axios.create({
   url:"http://homeworkplus.cn/data/users/",
   headers:{"content-type":"application/json"},
   method:'post',
@@ -270,7 +270,7 @@ class Register extends React.Component{
           }
           User.phone=values.手机号;
           User.email=values.邮箱;
-          postUser().catch(function(error){
+          enrollUser().catch(function(error){
             console.log(error);
           });
           this.setState({visible:false,visible2:true,});

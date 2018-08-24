@@ -233,14 +233,6 @@ class Studentcenter extends React.Component{
          if(!err){
              let str=localStorage.getItem("user")
              var user=JSON.parse(str)//字符串转换为对象
-             console.log(user)
-           //  var changeuserinformation=axios.create({
-           //    url:"http://homeworkplus.cn/data/users/"+localStorage.getItem("userloginKey")+"/",
-          //     headers:{"content-type":"application/json","token":localStorage.getItem('token')},
-          //     method:'put',
-          //     data:user,
-          //     timeout:1000,
-          //   })
           if(values.用户名){
             user.username=values.用户名;
           }
@@ -259,14 +251,19 @@ class Studentcenter extends React.Component{
                   editUser(
                     userData:{
                       id:${localStorage.getItem('userloginKey')},
-                   
-                      classNumber:${user.classNumber}
+                      username:"${user.username}",
+                      phone:"${user.phone}",
+                      classNumber:"${user.classNumber}"
                     }
                   ){
-                    username
-                    phone
-                    classNumber
-                  }`
+                     ok
+                     user{
+                       username
+                       phone
+                       classNumber
+                     }
+                  }
+                }`
               },
               timeout:1000,
             })
@@ -278,7 +275,11 @@ class Studentcenter extends React.Component{
                phone:user.phone
               })
               that.props.changeinformation(user);
-               message.success('用户信息修改成功!',3);
+               if(response.data.data.editUser.ok==true){
+                message.success('用户信息修改成功!',3);
+               }else{
+                message.error('用户信息修改失败!',3);
+               }
              })
              .catch(function(error){
                message.error('用户信息修改失败!',3);

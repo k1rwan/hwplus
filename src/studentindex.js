@@ -176,12 +176,12 @@ class StudentIndex extends React.Component{
 
    //修改用户信息
    changeinformation=(info)=>{
-      this.setState({username:info.username,class_number:info.class_number,phone:info.phone});
+      this.setState({username:info.username,class_number:info.classNumber,phone:info.phone});
    }
   
    //对studentcenter里面课程班管理的跳转操作进行反应
-   redirecttocourse=(e)=>{
-     this.setState({key:2,clickmenu:false,norepeatkey1:true,norepeatkey3:true,norepeatkey4:true,norepeatkey5:true,})
+   redirecttocourse=()=>{
+     this.setState({key:2,clickmenu:false,norepeatkey1:true,norepeatkey3:true,norepeatkey4:true,norepeatkey5:true})
    }
 
     render(){
@@ -257,7 +257,10 @@ class StudentIndex extends React.Component{
                       /> 
                     )}/>
                     <Route path='/studentcenter/class/:courseID' render={(props)=>(
-                      <Specificclass {...props}/>
+                      <Specificclass {...props}
+                      userinformation={userinformation}
+                      courselist={this.state.courselist}
+                      />
                     )}/>
                 </Switch>
             </Content>
