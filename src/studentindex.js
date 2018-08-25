@@ -184,7 +184,13 @@ class StudentIndex extends React.Component{
      this.setState({key:2,clickmenu:false,norepeatkey1:true,norepeatkey3:true,norepeatkey4:true,norepeatkey5:true})
    }
 
+   //对studentclass里面课程班管理的跳转操作进行反应
+   redirecttocourse2=()=>{
+    this.setState({key:2,clickmenu:false,norepeatkey1:true,norepeatkey2:true,norepeatkey3:true,norepeatkey4:true,norepeatkey5:true})
+   }    
+
     render(){
+
       userinformation.bupt_id=this.state.bupt_id;
       userinformation.class_number=this.state.class_number;
       userinformation.email=this.state.email;
@@ -209,7 +215,8 @@ class StudentIndex extends React.Component{
               <Menu
                 mode="inline"
                 theme='light'
-                defaultSelectedKeys={[this.state.key]}
+                defaultSelectedKeys={["1"]}
+                selectedKeys={[String(this.state.key)]}
                 style={{ height: '100%'}}
                 onClick={this.changehref}
               >
@@ -254,6 +261,7 @@ class StudentIndex extends React.Component{
                       <Studentclass {...props}
                         userinformation={userinformation}
                         courselist={this.state.courselist}
+                        redirecttocourse2={this.redirecttocourse2}
                       /> 
                     )}/>
                     <Route path='/studentcenter/class/:courseID' render={(props)=>(
