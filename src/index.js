@@ -8,6 +8,7 @@ import {Route,Switch,Link,HashRouter,BrowserRouter,Redirect} from 'react-router-
 import ValidateEmail from './validateEmail.js'
 import WrappedModifyPassword from './modifyPassword.js'
 import StudentIndex from './studentindex.js'
+import TeacherIndex from './teacherindex.js'
 const FormItem = Form.Item;
 const Option = Select.Option;
 const RadioGroup = Radio.Group;
@@ -615,6 +616,7 @@ const Main=()=>(
       <Route path='/emailcheck' component={ValidateEmail}/>
       <Route path='/forgetpassword' component={WrappedModifyPassword}/>
       <Route path='/studentcenter' component={StudentIndex}/>
+      <Route path='/teachercenter' component={TeacherIndex}/>
     </Switch>
   </main>
 )

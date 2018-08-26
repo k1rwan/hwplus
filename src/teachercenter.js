@@ -1,6 +1,6 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
-import './studentcenter.css';
+import './teachercenter.css';
 import { Upload, Icon, message,Row,Col,Button,Modal,Form,Input ,Card} from 'antd';
 import {Link} from 'react-router-dom';
 import axios from 'axios';
@@ -89,7 +89,7 @@ class UploadAvatar extends React.Component {
     }
   }
 
-class Studentcenter extends React.Component{
+class Teachercenter extends React.Component{
     constructor(props){
       super(props);
       this.state={
@@ -100,7 +100,6 @@ class Studentcenter extends React.Component{
         userinformation:this.props.userinformation,
         username:this.props.userinformation.username,
         phone:this.props.userinformation.phone,
-        class_number:this.props.userinformation.class_number,
         qrcode:"",//微信二维码所在的url
       }
     }
@@ -117,6 +116,7 @@ class Studentcenter extends React.Component{
       })
       var that=this;
       getQRcode().then(function(response){
+        console.log(response);
         that.setState({qrcode:response.data.qrcode});
       })
       .catch(function(error){
@@ -242,15 +242,12 @@ class Studentcenter extends React.Component{
 
     handleSubmit2=(e)=>{
       e.preventDefault();
-      this.props.form.validateFieldsAndScroll(["用户名","班级号","手机号"],(err,values)=>{
+      this.props.form.validateFieldsAndScroll(["用户名","手机号"],(err,values)=>{
          if(!err){
              let str=localStorage.getItem("user")
              var user=JSON.parse(str)//字符串转换为对象
           if(values.用户名){
             user.username=values.用户名;
-          }
-          if(values.班级号){
-            user.classNumber=values.班级号;
           }
           if(values.手机号){
             user.phone=values.手机号;
@@ -266,14 +263,12 @@ class Studentcenter extends React.Component{
                       id:${localStorage.getItem('userloginKey')},
                       username:"${user.username}",
                       phone:"${user.phone}",
-                      classNumber:"${user.classNumber}"
                     }
                   ){
                      ok
                      user{
                        username
                        phone
-                       classNumber
                      }
                   }
                 }`
@@ -281,10 +276,9 @@ class Studentcenter extends React.Component{
               timeout:1000,
             })
              var that=this;
-             if(values.用户名||values.班级号||values.手机号){
+             if(values.用户名||values.手机号){
              changeuserinformation().then(function(response){
                that.setState({username:user.username,
-               class_number:user.classNumber,
                phone:user.phone
               })
               that.props.changeinformation(user);
@@ -304,7 +298,6 @@ class Studentcenter extends React.Component{
     }
 
     render(){
-      console.log(this.props.courselist)
       const { getFieldDecorator } = this.props.form;
       const formItemLayout = {
         labelCol: {
@@ -329,54 +322,7 @@ class Studentcenter extends React.Component{
         },
       };
       const tips='您只需填自己想要变更的某个信息，不用把所有信息全填满'
-      const gridStyle={
-        width:'100%',
-        textAlign:'center',
-      }
-      if(this.props.courselist.length<courseIDrow.length){
-           courseIDrow=[];
-           courseRow=[];
-           allcourseRow=[];
-      }
-        for(let i in this.props.courselist){
-              if(_.indexOf(courseIDrow,this.props.courselist[i]["id"])===-1){
-              courseIDrow.push(this.props.courselist[i]["id"]);
-              var courseTeacher=[];
-              for(let j=0;j<this.props.courselist[i].teachers.length;j++){
-                courseTeacher.push(
-                  <span key={j} style={{marginLeft:"5px",marginRight:"5px"}}>
-                      {this.props.courselist[i].teachers[j]["name"]}
-                  </span>
-                )
-             }
-              if(courseIDrow.length<=3){
-              courseRow.push(
-                <Card.Grid key={this.props.courselist[i]["id"]} style={gridStyle}>
-                <Link to={'/studentcenter/class/'+this.props.courselist[i]["id"]+'/'} 
-                style={{color:"black"}}
-                onClick={this.props.redirecttocourse}
-                >   
-                {this.props.courselist[i]["name"]+"    教师:"}
-                {courseTeacher}
-                </Link>
-                </Card.Grid>
-              )
-              }
-              allcourseRow.push(
-                <Card.Grid key={this.props.courselist[i]["id"]} style={gridStyle}>
-                <Link to={'/studentcenter/class/'+this.props.courselist[i]["id"]+'/'} 
-                style={{color:"black"}}
-                onClick={this.props.redirecttocourse}
-                >   
-                {this.props.courselist[i]["name"]+"    教师:"}
-                {courseTeacher}
-                {this.props.courselist[i].marks+"学分"}
-                </Link>
-                </Card.Grid>
-              )
-          } 
-        }
-        return(
+       return(
             //背景以后会有专门的壁纸
             <div>
             <div style={{ textAlign: 'center' }}>
@@ -430,19 +376,6 @@ class Studentcenter extends React.Component{
                    <Button style={{marginTop:"30px"}} onClick={this.showModal1}>修改密码?</Button>
                    <br/>
                    <Button style={{marginTop:"15px"}} onClick={this.showModal2}>变更信息</Button>
-                </Col>
-              </Row>
-              <Row>
-                <Col xs={24} sm={{span:6,offset:6}}>
-                   <div style={{fontSize:"16px",marginTop:"30px",position:"relative"}}>
-                    已加入课程班
-                   </div>
-                   <Card style={{width:400}} hoverable="true">
-                     {courseRow}
-                     <Card.Grid key="-1" style={gridStyle} onClick={this.showModal3}>
-                     <span style={{color:"#2B91D5"}}> 更多课程......</span>
-                     </Card.Grid> 
-                     </Card>
                 </Col>
               </Row>
               <br/><br/>
@@ -531,18 +464,6 @@ class Studentcenter extends React.Component{
                  </FormItem>
                  <FormItem
                    {...formItemLayout}
-                   label="新的班级号"
-                 >
-                  {getFieldDecorator('班级号', {
-                   rules: [{
-                   whitespace:true
-                   }],
-                  })(
-                  <Input />
-                  )}
-                 </FormItem>
-                 <FormItem
-                   {...formItemLayout}
                    label="新的手机号"
                  >
                   {getFieldDecorator('手机号', {
@@ -560,19 +481,9 @@ class Studentcenter extends React.Component{
                 </FormItem>
               </Form>
             </Modal>
-            <Modal
-              title="课程班管理"
-              visible={this.state.visible3}
-              footer={null}
-              onCancel={this.handleCancel3}
-            >
-             <Card hoverable="true">
-             {allcourseRow}
-             </Card>
-            </Modal>
             </div>
         )
     }
 }
-const WrappedStudentcenter=Form.create()(Studentcenter);
-export default WrappedStudentcenter
+const WrappedTeachercenter=Form.create()(Teachercenter);
+export default WrappedTeachercenter;

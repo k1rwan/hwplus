@@ -1,12 +1,10 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
-import './studentindex.css';
+import './teacherindex.css';
 import {Modal,Button,Input,Tag,Icon,Layout,Menu,Breadcrumb,Avatar,Badge,Row,Col}from'antd';
 import axios from 'axios';
 import {Route,Switch,Link,HashRouter,BrowserRouter,Redirect} from 'react-router-dom';
-import WrappedStudentcenter from './studentcenter.js'
-import Studentclass from './studentclass.js'
-import Specificclass from './studentspecificclass.js'
+import WrappedTeachercenter from './teachercenter.js';
 import {_} from 'underscore'
 
 //大多数的地方使用graphql技术获取和传送数据
@@ -14,7 +12,7 @@ const { SubMenu } = Menu;
 const { Header, Content, Sider,Footer } = Layout;
 var userinformation={bupt_id:"",class_number:"",email:"",gender:"",id:"",name:"",username:"",usertype:"",phone:"",wechat:""};
 
-class StudentIndex extends React.Component{
+class TeacherIndex extends React.Component{
    constructor(props){
     super(props);
     this.state={
@@ -24,6 +22,8 @@ class StudentIndex extends React.Component{
         norepeatkey3:true,
         norepeatkey4:true,
         norepeatkey5:true,
+        norepeatkey5:true,
+        norepeatkey6:true,
         clickmenu:true,//确保是在点击侧边菜单的操作
         bupt_id:"",
         class_number:"",
@@ -41,11 +41,8 @@ class StudentIndex extends React.Component{
  }
    
    componentWillMount(){
-    if(window.location.pathname==='/studentcenter'){
+    if(window.location.pathname==='/teachercenter'){
       this.setState({norepeatkey1:false})
-    }
-    if(window.location.pathname==='/studentcenter/class'){
-       this.setState({norepeatkey2:false})
     }
     //后续随着路径的添加而增加
    }
@@ -100,75 +97,33 @@ class StudentIndex extends React.Component{
        console.log(error);
      })
       var lastUpdatestudentcourse=[];
-      this.getCourse=setInterval(()=>{
-      var getUserCourse=axios.create({
-        url:"http://homeworkplus.cn/graphql/",
-        headers:{"content-type":"application/json","token":localStorage.getItem('token'),"Accept":"application/json"},
-        method:'post',
-        data:{
-          "query":`query{
-            getUsersByIds(ids:${localStorage.getItem('userloginKey')})
-            {
-              studentsCourse{
-                id
-                name
-                description
-                marks
-                school
-                startTime
-                endTime
-                teachers{
-                  id
-                  name
-                }
-                teachingAssistants{
-                  id
-                  name
-                }
-                students{
-                  id
-                  name
-                }
-              }
-            }
-           }`
-        },
-        timeout:1000,
-      })
-      getUserCourse().then(function(response){
-        //获得该用户拥有的所有的课程版的ID
-        if(JSON.stringify(lastUpdatestudentcourse)!==JSON.stringify(response.data.data.getUsersByIds[0].studentsCourse)){
-          lastUpdatestudentcourse=response.data.data.getUsersByIds[0].studentsCourse;
-          that.setState({courselist:lastUpdatestudentcourse})
-        }
-      })
-      .catch(function(error){
-        console.log(error);
-      });
-     },1000)
+
    }
    
    componentDidUpdate(){
     if(this.state.key==1&&this.state.norepeatkey1&&this.state.clickmenu){
-      this.setState({norepeatkey1:false,norepeatkey2:true,norepeatkey3:true,norepeatkey4:true,norepeatkey5:true,});
+      this.setState({norepeatkey1:false,norepeatkey2:true,norepeatkey3:true,norepeatkey4:true,norepeatkey5:true,norepeatkey6:true});
      }
     if(this.state.key==2&&this.state.norepeatkey2&&this.state.clickmenu){
-     this.setState({norepeatkey1:true,norepeatkey2:false,norepeatkey3:true,norepeatkey4:true,norepeatkey5:true,});
+      this.setState({norepeatkey1:true,norepeatkey2:false,norepeatkey3:true,norepeatkey4:true,norepeatkey5:true,norepeatkey6:true});
     }
     if(this.state.key==3&&this.state.norepeatkey3&&this.state.clickmenu){
-      this.setState({norepeatkey1:true,norepeatkey2:true,norepeatkey3:false,norepeatkey4:true,norepeatkey5:true,});
+      this.setState({norepeatkey1:true,norepeatkey2:true,norepeatkey3:false,norepeatkey4:true,norepeatkey5:true,norepeatkey6:true});
      }
     if(this.state.key==4&&this.state.norepeatkey4&&this.state.clickmenu){
-     this.setState({norepeatkey1:true,norepeatkey2:true,norepeatkey3:true,norepeatkey4:false,norepeatkey5:true,});
+      this.setState({norepeatkey1:true,norepeatkey2:true,norepeatkey3:true,norepeatkey4:false,norepeatkey5:true,norepeatkey6:true});
     }
     if(this.state.key==5&&this.state.norepeatkey5&&this.state.clickmenu){
-      this.setState({norepeatkey1:true,norepeatkey2:true,norepeatkey3:true,norepeatkey4:true,norepeatkey5:false,});
+      this.setState({norepeatkey1:true,norepeatkey2:true,norepeatkey3:true,norepeatkey4:true,norepeatkey5:false,norepeatkey6:true});
+     }
+    if(this.state.key==6&&this.state.norepeatkey6&&this.state.clickmenu){
+      this.setState({norepeatkey1:true,norepeatkey2:true,norepeatkey3:true,norepeatkey4:true,norepeatkey5:true,norepeatkey6:false});
      }
    }
 
-   componentWillUnmount(){
-     clearInterval(this.getCourse);
-   }
+ //  componentWillUnmount(){
+ //    clearInterval(this.getCourse);
+  // }
 
    changehref=({ item, key, keyPath })=>{
       this.setState({key:key,clickmenu:true,});
@@ -176,7 +131,7 @@ class StudentIndex extends React.Component{
 
    //修改用户信息
    changeinformation=(info)=>{
-      this.setState({username:info.username,class_number:info.classNumber,phone:info.phone});
+      this.setState({username:info.username,phone:info.phone});
    }
   
    //对studentcenter里面课程班管理的跳转操作进行反应
@@ -200,11 +155,12 @@ class StudentIndex extends React.Component{
       userinformation.phone=this.state.phone;
       userinformation.usertype=this.state.usertype;
       userinformation.wechat=this.state.wechat;
+      console.log(userinformation)
       if(this.state.key==1&&this.state.norepeatkey1&&this.state.clickmenu){
-        return (<Redirect exact push to='/studentcenter'/>);
+        return (<Redirect exact push to='/teachercenter'/>);
        }
       if(this.state.key==2&&this.state.norepeatkey2&&this.state.clickmenu){
-       return (<Redirect exact push to='/studentcenter/class'/>);
+       return (<Redirect exact push to='/teachercenter/teacherclass'/>);
       }
       //后续随着路径的添加而增加
         return(
@@ -221,9 +177,10 @@ class StudentIndex extends React.Component{
               >
                   <Menu.Item key="1"><span><Icon type="user" />我的</span></Menu.Item>
                   <Menu.Item key="2"><span><Icon type="usergroup-add" />课程组</span></Menu.Item>
-                  <Menu.Item key="3"><span><Icon type="form" />我的作业</span></Menu.Item>
-                  <Menu.Item key="4"><span><Icon type="info-circle" />消息</span></Menu.Item>
-                  <Menu.Item key="5" className="aboutus"><span className="aboutus2" >关于Homework+</span></Menu.Item>
+                  <Menu.Item key="3"><span><Icon type="form" />批改作业</span></Menu.Item>
+                  <Menu.Item key="4"><span><Icon type="plus-square-o" />创建课程</span></Menu.Item>
+                  <Menu.Item key="5"><span><Icon type="info-circle" />消息</span></Menu.Item>
+                  <Menu.Item key="6" className="aboutus"><span className="aboutus2" >关于Homework+</span></Menu.Item>
               </Menu>
             </Sider>
           </Layout>
@@ -247,29 +204,14 @@ class StudentIndex extends React.Component{
             </Menu>
             </Header>
             <Content style={{ background: '#E6E6E6',paddingLeft: 200,paddingTop:64, margin: 0, minHeight: 280 }}>
-                <Switch>
-                    <Route exact path='/studentcenter' render={(props)=>(
-                      <WrappedStudentcenter {...props} 
+            <Switch>
+                    <Route exact path='/teachercenter' render={(props)=>(
+                      <WrappedTeachercenter {...props} 
                        userinformation={userinformation}
                        changeinformation={this.changeinformation}
-                       courselist={this.state.courselist}
-                       redirecttocourse={this.redirecttocourse}
                        />
                     )}/>
-                    <Route exact path='/studentcenter/class' render={(props)=>(
-                      <Studentclass {...props}
-                        userinformation={userinformation}
-                        courselist={this.state.courselist}
-                        redirecttocourse2={this.redirecttocourse2}
-                      /> 
-                    )}/>
-                    <Route path='/studentcenter/class/:courseID' render={(props)=>(
-                      <Specificclass {...props}
-                      userinformation={userinformation}
-                      courselist={this.state.courselist}
-                      />
-                    )}/>
-                </Switch>
+            </Switch>
             </Content>
             <Footer style={{background:'#E6E6E6'}}>Footer</Footer>
             </Layout>
@@ -278,23 +220,4 @@ class StudentIndex extends React.Component{
     }
 }
 
-
-
-//const StudentIndex=()=>(
-//    <main>
-//        <Switch>
-//           <Route exact path='/studentcenter/' component={Studentcenter}/>
-//           <Route exact path='/studentcenter/class/' component={Studentclass}/>
-//           <Route path='/studentcenter/class/courseid/' component={StudentclassID}/>
-//           <Route path='/studentcenter/feedback/' component={StudentFeedback}/>
-//           <Route path='/studentcenter/homework/' component={Studenthomework}/>
-//           <Route path='/studentcenter/message/' component={StudentMessage}/>
-//           <Route path='/studentcenter/showhomework/' component={Showhomework}/>
-//           <Route path='/studentcenter/handling/' component={Handling}/>
-//           <Route path='/aboutus/' component={Introducing}/>
-//        </Switch>
-//    </main>    
-//)
-
-
-export default StudentIndex;
+export default TeacherIndex;
