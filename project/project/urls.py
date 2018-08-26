@@ -21,10 +21,13 @@ from graphene_django.views import GraphQLView
 from project.schema import schema
 
 from data.safe_gql_view import BetterGraphQLView
+from django.views.static import serve
+from project import settings
 
 urlpatterns = [
     path('admin/', admin.site.urls),
 	url(r'^api-auth/', include('rest_framework.urls')),
     url(r'^',include('data.urls')),
-    path('graphql/', BetterGraphQLView.as_view(graphiql=True, schema=schema))
+    path('graphql/', BetterGraphQLView.as_view(graphiql=True, schema=schema)),
+    url(r'^media/(?P<path>.*)$', serve, {'document_root': settings.MEDIA_ROOT})
 ]

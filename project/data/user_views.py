@@ -60,7 +60,7 @@ def login(request):
             from_username = request.data['username']
             from_password = request.data['password']
         except:
-            openid = request.data['openid']
+            openid = request.META['HTTP_TOKEN']
             hs = encrypt.getHash(openid)
             print(hs)
             realuser = User.objects.get(wechat=hs)
@@ -142,7 +142,7 @@ def user_list(request):
                     data['result'] = results['SUCCESS']
                     return Response(data=data, headers=headers)
             except:
-                openid = request.data['openid']
+                openid = request.META['HTTP_TOKEN']
                 hs = encrypt.getHash(openid)
                 if User.objects.get(wechat=hs):
                     queryset = User.objects.all()
@@ -216,7 +216,7 @@ def user_detail(request, pk):
                 data['result'] = results['SUCCESS']
                 return Response(data=data, headers=headers)
             except:
-                openid = request.data['openid']
+                openid = request.META['HTTP_TOKEN']
                 hs = encrypt.getHash(openid)
                 User.objects.get(wechat=hs)
                 headers['isLogin'] = True
@@ -246,7 +246,7 @@ def user_detail(request, pk):
                 plain = token.confirm_validate_token(
                     request.META['HTTP_TOKEN'])
             except:
-                openid = request.data['openid']
+                openid = request.META['HTTP_TOKEN']
                 found_user = User.objects.get(pk=pk)
                 found_user.wechat = encrypt.getHash(openid)
                 found_user.save()

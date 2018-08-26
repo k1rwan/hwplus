@@ -50,6 +50,9 @@ class HWFCourseClass(models.Model):
     students = models.ManyToManyField(
         User, related_name='students_course', null=True, blank=True
         )
+    school = models.TextField(null=True,blank=True)
+    start_time = models.DateTimeField(null=True, blank=True)
+    end_time = models.DateTimeField(null=True, blank=True)
     
     def __str__(self):
         return self.name
