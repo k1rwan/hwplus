@@ -7,9 +7,9 @@ import axios from 'axios';
 import {_} from 'underscore'
 import {moment} from 'moment'
 var avatarFile;//头像文件
-var courseRow=[];//学生的课程列表
-var allcourseRow=[];//学生所有的课程列表
-var courseIDrow=[];//学生的课程列表ID，防止重复
+var courseRow=[];//教师的课程列表
+var allcourseRow=[];//教师所有的课程列表
+var courseIDrow=[];//教师的课程列表ID，防止重复
 var Userlogin={type:'',content:''};
 var pass={old_pass:"",new_pass:""};
 const FormItem = Form.Item;
@@ -116,7 +116,6 @@ class Teachercenter extends React.Component{
       })
       var that=this;
       getQRcode().then(function(response){
-        console.log(response);
         that.setState({qrcode:response.data.qrcode});
       })
       .catch(function(error){
@@ -322,6 +321,53 @@ class Teachercenter extends React.Component{
         },
       };
       const tips='您只需填自己想要变更的某个信息，不用把所有信息全填满'
+      const gridStyle={
+        width:'100%',
+        textAlign:'center',
+      }
+      if(this.props.courselist.length<courseIDrow.length){
+        courseIDrow=[];
+        courseRow=[];
+        allcourseRow=[];
+      }
+     for(let i in this.props.courselist){
+           if(_.indexOf(courseIDrow,this.props.courselist[i]["id"])===-1){
+           courseIDrow.push(this.props.courselist[i]["id"]);
+           var courseTeacher=[];
+           for(let j=0;j<this.props.courselist[i].teachers.length;j++){
+             courseTeacher.push(
+               <span key={j} style={{marginLeft:"5px",marginRight:"5px"}}>
+                   {this.props.courselist[i].teachers[j]["name"]}
+               </span>
+             )
+          }
+           if(courseIDrow.length<=3){
+           courseRow.push(
+             <Card.Grid key={this.props.courselist[i]["id"]} style={gridStyle}>
+             <Link to={'/teachercenter/teacherclass/'+this.props.courselist[i]["id"]+'/'} 
+             style={{color:"black"}}
+             onClick={this.props.redirecttocourse}
+             >   
+             {this.props.courselist[i]["name"]+"    教师:"}
+             {courseTeacher}
+             </Link>
+             </Card.Grid>
+           )
+           }
+           allcourseRow.push(
+             <Card.Grid key={this.props.courselist[i]["id"]} style={gridStyle}>
+             <Link to={'/teachercenter/teacherclass/'+this.props.courselist[i]["id"]+'/'} 
+             style={{color:"black"}}
+             onClick={this.props.redirecttocourse}
+             >   
+             {this.props.courselist[i]["name"]+"    教师:"}
+             {courseTeacher}
+             {this.props.courselist[i].marks+"学分"}
+             </Link>
+             </Card.Grid>
+           )
+       } 
+     }
        return(
             //背景以后会有专门的壁纸
             <div>
@@ -376,6 +422,20 @@ class Teachercenter extends React.Component{
                    <Button style={{marginTop:"30px"}} onClick={this.showModal1}>修改密码?</Button>
                    <br/>
                    <Button style={{marginTop:"15px"}} onClick={this.showModal2}>变更信息</Button>
+                </Col>
+              </Row>
+              <br/><br/>
+              <Row>
+                <Col xs={24} sm={{span:6,offset:6}}>
+                   <div style={{fontSize:"16px",marginTop:"30px",position:"relative"}}>
+                    我的课程班
+                   </div>
+                   <Card style={{width:400}} hoverable="true">
+                     {courseRow}
+                     <Card.Grid key="-1" style={gridStyle} onClick={this.showModal3}>
+                     <span style={{color:"#2B91D5"}}> 更多课程......</span>
+                     </Card.Grid> 
+                     </Card>
                 </Col>
               </Row>
               <br/><br/>
@@ -480,6 +540,16 @@ class Teachercenter extends React.Component{
                    <Button type="primary" htmlType="submit" className="submit2" >确认</Button>
                 </FormItem>
               </Form>
+            </Modal>
+            <Modal
+              title="课程班管理"
+              visible={this.state.visible3}
+              footer={null}
+              onCancel={this.handleCancel3}
+            >
+             <Card hoverable="true">
+             {allcourseRow}
+             </Card>
             </Modal>
             </div>
         )

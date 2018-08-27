@@ -36,7 +36,6 @@ class StudentIndex extends React.Component{
         usertype:"",
         wechat:"",
         courselist:[],//学生加入的课程班信息，为一个数组，数组里面的每个元素均为单个课程班的信息
-        assistantRow:[],//所有的课程助教名字列表，为一个数组，数组里面的每个元素均为单个课程的助教列表
     }
  }
    

@@ -5,6 +5,8 @@ import {Modal,Button,Input,Tag,Icon,Layout,Menu,Breadcrumb,Avatar,Badge,Row,Col}
 import axios from 'axios';
 import {Route,Switch,Link,HashRouter,BrowserRouter,Redirect} from 'react-router-dom';
 import WrappedTeachercenter from './teachercenter.js';
+import Teacherclass from './teacherclass.js';
+import WrappedAddcourse from './teacheraddcourse.js'
 import {_} from 'underscore'
 
 //大多数的地方使用graphql技术获取和传送数据
@@ -35,8 +37,7 @@ class TeacherIndex extends React.Component{
         username:"",
         usertype:"",
         wechat:"",
-        courselist:[],//学生加入的课程班信息，为一个数组，数组里面的每个元素均为单个课程班的信息
-        assistantRow:[],//所有的课程助教名字列表，为一个数组，数组里面的每个元素均为单个课程的助教列表
+        courselist:[],//教师的课程班信息，为一个数组，数组里面的每个元素均为单个课程班的信息
     }
  }
    
@@ -96,8 +97,56 @@ class TeacherIndex extends React.Component{
      .catch(function(error){
        console.log(error);
      })
-      var lastUpdatestudentcourse=[];
-
+     var lastUpdateteachercourse=[];
+     this.getCourse=setInterval(()=>{
+     var getUserCourse=axios.create({
+       url:"http://homeworkplus.cn/graphql/",
+       headers:{"content-type":"application/json","token":localStorage.getItem('token'),"Accept":"application/json"},
+       method:'post',
+       data:{
+         "query":`query{
+           getUsersByIds(ids:${localStorage.getItem('userloginKey')})
+           {
+             teachersCourse{
+               id
+               name
+               description
+               marks
+               school
+               startTime
+               endTime
+               teachers{
+                 id
+                 name
+               }
+               teachingAssistants{
+                 id
+                 name
+               }
+               students{
+                 id
+                 buptId
+                 name
+                 usertype
+                 classNumber
+               }
+             }
+           }
+          }`
+       },
+       timeout:1000,
+     })
+     getUserCourse().then(function(response){
+       //获得该用户拥有的所有的课程版的ID
+       if(JSON.stringify(lastUpdateteachercourse)!==JSON.stringify(response.data.data.getUsersByIds[0].teachersCourse)){
+         lastUpdateteachercourse=response.data.data.getUsersByIds[0].teachersCourse;
+         that.setState({courselist:lastUpdateteachercourse})
+       }
+     })
+     .catch(function(error){
+       console.log(error);
+     });
+    },1000)
    }
    
    componentDidUpdate(){
@@ -121,9 +170,9 @@ class TeacherIndex extends React.Component{
      }
    }
 
- //  componentWillUnmount(){
- //    clearInterval(this.getCourse);
-  // }
+   componentWillUnmount(){
+     clearInterval(this.getCourse);
+   }
 
    changehref=({ item, key, keyPath })=>{
       this.setState({key:key,clickmenu:true,});
@@ -134,14 +183,14 @@ class TeacherIndex extends React.Component{
       this.setState({username:info.username,phone:info.phone});
    }
   
-   //对studentcenter里面课程班管理的跳转操作进行反应
+   //对teachercenter里面课程班管理的跳转操作进行反应
    redirecttocourse=()=>{
-     this.setState({key:2,clickmenu:false,norepeatkey1:true,norepeatkey3:true,norepeatkey4:true,norepeatkey5:true})
+     this.setState({key:2,clickmenu:false,norepeatkey1:true,norepeatkey3:true,norepeatkey4:true,norepeatkey5:true,norepeatkey6:true})
    }
 
-   //对studentclass里面课程班管理的跳转操作进行反应
+   //对teacherclass里面课程班管理的跳转操作进行反应
    redirecttocourse2=()=>{
-    this.setState({key:2,clickmenu:false,norepeatkey1:true,norepeatkey2:true,norepeatkey3:true,norepeatkey4:true,norepeatkey5:true})
+    this.setState({key:2,clickmenu:false,norepeatkey1:true,norepeatkey2:true,norepeatkey3:true,norepeatkey4:true,norepeatkey5:true,norepeatkey6:true})
    }    
 
     render(){
@@ -155,12 +204,14 @@ class TeacherIndex extends React.Component{
       userinformation.phone=this.state.phone;
       userinformation.usertype=this.state.usertype;
       userinformation.wechat=this.state.wechat;
-      console.log(userinformation)
       if(this.state.key==1&&this.state.norepeatkey1&&this.state.clickmenu){
         return (<Redirect exact push to='/teachercenter'/>);
        }
       if(this.state.key==2&&this.state.norepeatkey2&&this.state.clickmenu){
        return (<Redirect exact push to='/teachercenter/teacherclass'/>);
+      }
+      if(this.state.key==4&&this.state.norepeatkey4&&this.state.clickmenu){
+        return (<Redirect exact push to='/teachercenter/createclass'/>);
       }
       //后续随着路径的添加而增加
         return(
@@ -205,12 +256,26 @@ class TeacherIndex extends React.Component{
             </Header>
             <Content style={{ background: '#E6E6E6',paddingLeft: 200,paddingTop:64, margin: 0, minHeight: 280 }}>
             <Switch>
-                    <Route exact path='/teachercenter' render={(props)=>(
-                      <WrappedTeachercenter {...props} 
-                       userinformation={userinformation}
-                       changeinformation={this.changeinformation}
-                       />
-                    )}/>
+                <Route exact path='/teachercenter' render={(props)=>(
+                  <WrappedTeachercenter {...props}
+                    userinformation={userinformation}
+                    changeinformation={this.changeinformation}
+                    courselist={this.state.courselist}
+                    redirecttocourse={this.redirecttocourse}
+                  />
+                )}/>
+                <Route exact path='/teachercenter/teacherclass' render={(props)=>(
+                  <Teacherclass {...props}
+                    userinformation={userinformation}
+                    courselist={this.state.courselist}
+                    redirecttocourse2={this.redirecttocourse2}
+                  /> 
+                )}/>
+                <Route exact path='/teachercenter/createclass' render={(props)=>(
+                  <WrappedAddcourse {...props}
+                    userinformation={userinformation}
+                  /> 
+                )}/>
             </Switch>
             </Content>
             <Footer style={{background:'#E6E6E6'}}>Footer</Footer>
