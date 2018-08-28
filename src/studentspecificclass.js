@@ -5,6 +5,7 @@ import './studentspecificclass.css';
 import {_} from 'underscore'
 var courseid;//特定课程的id
 var re=/^\/studentcenter\/class\/(.*)\/$/;
+var toDate=/^(\d{4})\-(\d{2})\-(\d{2})(.*)$/;
 class Specificclass extends React.Component{
     constructor(props){
         super(props);
@@ -80,7 +81,17 @@ class Specificclass extends React.Component{
                    <Button type="primary">课程讨论区</Button>
                  </Col>
                  <Col xs={24} sm={12} style={{fontSize:"20px"}}>{this.state.specificCourse[0].marks}学分</Col>
-                 <Col xs={24} sm={24} style={{fontSize:"20px",marginTop:"15px"}}>时间:</Col>
+                 <Col xs={24} sm={24} style={{fontSize:"20px",marginTop:"15px"}}>
+                 时间:
+                 <span style={{marginLeft:"10%"}}>
+                 {toDate.exec(this.state.specificCourse[0].startTime)[1]+"."}
+                 {toDate.exec(this.state.specificCourse[0].startTime)[2]+"."}
+                 {toDate.exec(this.state.specificCourse[0].startTime)[3]+"--"}
+                 {toDate.exec(this.state.specificCourse[0].endTime)[1]+"."}
+                 {toDate.exec(this.state.specificCourse[0].endTime)[2]+"."}
+                 {toDate.exec(this.state.specificCourse[0].endTime)[3]}
+                 </span>
+                 </Col>
               </Card.Grid>
            </Card>
          </div>

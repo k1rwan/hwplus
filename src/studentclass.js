@@ -8,6 +8,7 @@ import {_} from 'underscore'
 var classRow=[];//课程班显示在网页卡片上的列表
 var courseIDrow=[];//学生的课程列表ID，防止重复
 const Option=Select.Option;
+var toDate=/^(\d{4})\-(\d{2})\-(\d{2})(.*)$/;
 
 class Studentclass extends React.Component{
     render(){
@@ -56,7 +57,17 @@ class Studentclass extends React.Component{
               </Row>
               <Row>
                 <Col xs={24} sm={8} >开课学院: {this.props.courselist[i].school}</Col> 
-                <Col xs={24} sm={8} style={{left:"10%"}}>时间: </Col>
+                <Col xs={24} sm={8} style={{left:"10%"}}>
+                时间: 
+                <span style={{marginLeft:"10%"}}>
+                {toDate.exec(this.props.courselist[i].startTime)[1]+"."}
+                {toDate.exec(this.props.courselist[i].startTime)[2]+"."}
+                {toDate.exec(this.props.courselist[i].startTime)[3]+"--"}
+                {toDate.exec(this.props.courselist[i].endTime)[1]+"."}
+                {toDate.exec(this.props.courselist[i].endTime)[2]+"."}
+                {toDate.exec(this.props.courselist[i].endTime)[3]}
+                </span>
+                </Col>
               </Row> 
               </span>
             } 

@@ -15,6 +15,7 @@ var pass={old_pass:"",new_pass:""};
 const FormItem = Form.Item;
 var validPassword =/^\w{6,20}$/;
 var validPhone=/^1\d{10}$/;
+var toDate=/^(\d{4})\-(\d{2})\-(\d{2})(.*)$/;
 var loginUser=axios.create({
   url:"http://homeworkplus.cn/data/is_repeated/",
   headers:{"content-type":"application/json"},
@@ -362,7 +363,11 @@ class Teachercenter extends React.Component{
              >   
              {this.props.courselist[i]["name"]+"    教师:"}
              {courseTeacher}
-             {this.props.courselist[i].marks+"学分"}
+             {this.props.courselist[i].marks+"学分 "}
+             {toDate.exec(this.props.courselist[i].startTime)[1]+"."}
+             {toDate.exec(this.props.courselist[i].startTime)[2]+"--"}
+             {toDate.exec(this.props.courselist[i].endTime)[1]+"."}
+             {toDate.exec(this.props.courselist[i].endTime)[2]}
              </Link>
              </Card.Grid>
            )
