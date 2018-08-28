@@ -298,6 +298,7 @@ class Teachercenter extends React.Component{
     }
 
     render(){
+      console.log(this.props.courselist)
       const { getFieldDecorator } = this.props.form;
       const formItemLayout = {
         labelCol: {

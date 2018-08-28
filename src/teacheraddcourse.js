@@ -183,7 +183,76 @@ class Addcourse extends React.Component{
               ...values,
               "开课时间":[values.开课时间[0].format('YYYY-MM-DD'), values.开课时间[1].format('YYYY-MM-DD')],
             }
-            console.log(value);
+            var getTeachersId=axios.create({
+              url:"http://homeworkplus.cn/graphql/",
+              headers:{"content-type":"application/json","token":localStorage.getItem('token'),"Accept":"application/json"},
+              method:'post',
+              data:{
+                "query":`query{
+                   getUsersByUsernames(usernames:${JSON.stringify(value.授课教师)})
+                   {
+                     id
+                   }
+                }`
+              },
+              timeout:1000,
+            })
+            if(typeof(value.助教)=="undefined"){
+              value.助教=[];
+            }
+            var getAssistantsId=axios.create({
+              url:"http://homeworkplus.cn/graphql/",
+              headers:{"content-type":"application/json","token":localStorage.getItem('token'),"Accept":"application/json"},
+              method:'post',
+              data:{
+                "query":`query{
+                   getUsersByUsernames(usernames:${JSON.stringify(value.助教)})
+                   {
+                     id
+                   }
+                }`
+              },
+              timeout:1000,
+            })
+            axios.all([getTeachersId(),getAssistantsId()])
+            .then(axios.spread(function(teacher,assistant){
+              value.授课教师=_.pluck(teacher.data.data.getUsersByUsernames,'id');
+              value.助教=_.pluck(assistant.data.data.getUsersByUsernames,'id');
+              var createcourse=axios.create({
+                url:"http://homeworkplus.cn/graphql/",
+                headers:{"content-type":"application/json","token":localStorage.getItem('token'),"Accept":"application/json"},
+                method:'post',
+                data:{
+                  "query":`mutation{
+                    createCourse(
+                      courseData:{
+                        name:"${value.课程名称}",
+                        description:"${value.课程简介}",
+                        marks:${value.学分},
+                        teachers:[${value.授课教师}],
+                        teachingAssistants:[${value.助教}],
+                        school:"${value.开课学院}",
+                        startTime:"${value.开课时间[0]+"T00:00:00+00:00"}",
+                        endTime:"${value.开课时间[1]+"T00:00:00+00:00"}",
+                      }
+                    ){
+                       ok
+                    }
+                  }`
+                },
+                timeout:1000,
+              })
+              createcourse().then(function(response){
+                if(response.data.data.createCourse.ok==true){
+                  message.success('课程创建成功!',3);
+                 }else{
+                  message.error('课程创建失败!',3);
+                 }
+              })
+              .catch(function(error){
+                message.error('课程创建失败!',3);
+              })
+            }))
             this.props.form.resetFields();
           }
         })
