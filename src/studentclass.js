@@ -13,6 +13,7 @@ var toDate=/^(\d{4})\-(\d{2})\-(\d{2})(.*)$/;
 class Studentclass extends React.Component{
     render(){
       console.log(this.props.courselist)
+      console.log(this.props.assistantcourselist)
       const gridStyle={
           width:"33.3%",
           textAlign:'center',

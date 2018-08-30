@@ -1,7 +1,7 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
 import './modifyPassword.css';
-import {Modal,Button,Input,Tag,Form,Tooltip,Icon,Cascader,Select,Row,Col,Checkbox,AutoComplete,Radio}from'antd';
+import {Modal,Button,Input,Form}from'antd';
 import axios from 'axios';
 const FormItem = Form.Item;
 var gotToken='';
@@ -39,7 +39,6 @@ class ModifyPassword extends React.Component{
 
     componentWillUnmount(){
         gotToken='';
-        this.state.name='';
     }
 
     compareToFirstPassword = (rule, value, callback) => {
@@ -93,7 +92,6 @@ class ModifyPassword extends React.Component{
 
     render(){
         const { getFieldDecorator } = this.props.form;
-        const { autoCompleteResult } = this.state;
         const formItemLayout = {
           labelCol: {
             xs: { span: 24 },

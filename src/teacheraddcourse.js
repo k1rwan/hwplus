@@ -9,7 +9,8 @@ const FormItem = Form.Item;
 const Option=Select.Option;
 const RangePicker = DatePicker.RangePicker;
 const { TextArea } = Input;
-const children=[];
+const children1=[];//教师选项列表
+const children2=[];//助教选项列表
 var lastUpdateteachersusername=[];//最后更新时教师的名字列表
 var lastUpdateassistantsusername=[];//最后更新时助教的名字列表
 var defaultteacher;//SelectTeacher的默认值
@@ -42,7 +43,7 @@ class SelectTeacher extends React.Component{
         if(JSON.stringify(lastUpdateteachersusername)!==JSON.stringify(response.data.data.getUsersByUsertype)){
          lastUpdateteachersusername=response.data.data.getUsersByUsertype;
          for(let i=0;i<response.data.data.getUsersByUsertype.length;i++){
-          children.push(
+          children1.push(
           <Option key={response.data.data.getUsersByUsertype[i].username} value={response.data.data.getUsersByUsertype[i].username}>
           {response.data.data.getUsersByUsertype[i].username}
           </Option>);
@@ -85,7 +86,7 @@ class SelectTeacher extends React.Component{
           onChange={this.handleChange}
           value={this.state.teachersUsername}
         >
-          {children}
+          {children1}
           </Select>
         )
     }
@@ -106,7 +107,7 @@ class SelectAssistant extends React.Component{
       method:'post',
       data:{
          "query":`query{
-           getUsersByUsertype(usertype:"assistant")
+           allUsers
            {
              username
            }
@@ -115,12 +116,12 @@ class SelectAssistant extends React.Component{
       timeout:1000,
     })
     getAssistantsusername().then(function(response){
-      if(JSON.stringify(lastUpdateassistantsusername)!==JSON.stringify(response.data.data.getUsersByUsertype)){
-       lastUpdateassistantsusername=response.data.data.getUsersByUsertype;
-       for(let i=0;i<response.data.data.getUsersByUsertype.length;i++){
-        children.push(
-        <Option key={response.data.data.getUsersByUsertype[i].username} value={response.data.data.getUsersByUsertype[i].username}>
-        {response.data.data.getUsersByUsertype[i].username}
+      if(JSON.stringify(lastUpdateassistantsusername)!==JSON.stringify(response.data.data.allUsers)){
+       lastUpdateassistantsusername=response.data.data.allUsers;
+       for(let i=0;i<response.data.data.allUsers.length;i++){
+        children2.push(
+        <Option key={response.data.data.allUsers[i].username} value={response.data.data.allUsers[i].username}>
+        {response.data.data.allUsers[i].username}
         </Option>);
        }
       }
@@ -160,7 +161,7 @@ class SelectAssistant extends React.Component{
         onChange={this.handleChange}
         value={this.state.assistantsUsername}
       >
-        {children}
+        {children2}
         </Select>
       )
   }
@@ -178,6 +179,7 @@ class Addcourse extends React.Component{
     handleSubmit=(e)=>{
         e.preventDefault();
         this.props.form.validateFieldsAndScroll(["课程名称","授课教师","开课学院","助教","开课时间","学分","课程简介"],(err,values)=>{
+          console.log(values)
           if(!err){
             const value={
               ...values,

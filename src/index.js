@@ -2,18 +2,17 @@ import React from 'react';
 import ReactDOM from 'react-dom';
 import './index.css';
 import registerServiceWorker from './registerServiceWorker';
-import {Modal,Button,Input,Tag,Form,Tooltip,Icon,Cascader,Select,Row,Col,Checkbox,AutoComplete,Radio}from'antd';
+import {Modal,Button,Input,Form,Row,Col,Radio,message}from'antd';
 import axios from 'axios';
-import {Route,Switch,Link,HashRouter,BrowserRouter,Redirect} from 'react-router-dom';
+import {Route,Switch,BrowserRouter,Redirect} from 'react-router-dom';
 import ValidateEmail from './validateEmail.js'
 import WrappedModifyPassword from './modifyPassword.js'
 import StudentIndex from './studentindex.js'
 import TeacherIndex from './teacherindex.js'
 const FormItem = Form.Item;
-const Option = Select.Option;
 const RadioGroup = Radio.Group;
 
-var User={name:'',username:'',gender:'',usertype:'',password:'',wechat:'',bupt_id:'',class_number:'',email:'',phone:''};
+var User={name:'',username:'',gender:'',usertype:'',password:'',bupt_id:'',class_number:'',email:'',phone:''};
 var Userlogin={type:'',content:''};
 var Userlogin2={username:'',password:''};
 var userinformation={username:''};
@@ -70,8 +69,6 @@ class Login extends React.Component{
       this.setState({loginTitle:"学生登录"});
     }else if(e.target.innerText==="教师入口"){
       this.setState({loginTitle:"教师登录"});
-    }else if(e.target.innerText==="助教入口"){
-      this.setState({loginTitle:"助教登录"});
     }
     this.setState({entry:true,redirect:false});
   }
@@ -98,9 +95,6 @@ class Login extends React.Component{
       }else if (localStorage.getItem("type")==='teacher'&&that.state.loginTitle==="教师登录"){
         checkLogin=1;
         loginhref="/teachercenter";
-      }else if(localStorage.getItem("type")==='assistant'&&that.state.loginTitle==="助教登录"){
-        checkLogin=1;
-        loginhref="/assistantcenter";
       }
       if(!(localStorage.getItem("token")==="None")){
       that.setState({entry:false,redirect:true});
@@ -137,7 +131,6 @@ class Login extends React.Component{
    }
   render(){
     const { getFieldDecorator } = this.props.form;
-    const { autoCompleteResult } = this.state;
     const formItemLayout = {
       labelCol: {
         xs: { span: 24 },
@@ -175,14 +168,11 @@ class Login extends React.Component{
       </Row>
       <br/><br/><br/><br/><br/>
       <Row>
-      <Col xs={24} sm={8}>
+      <Col xs={24} sm={12}>
       <Button  className="studententry" onClick={this.showModal} size="large" >学生入口</Button>
       </Col>
-      <Col xs={24} sm={8}>
+      <Col xs={24} sm={12}>
       <Button  className="teacherentry" onClick={this.showModal} size="large" >教师入口</Button>
-      </Col>
-      <Col xs={24} sm={8}>
-      <Button  className="assistantentry" onClick={this.showModal} size="large" >助教入口</Button>
       </Col>
       </Row>
       <Modal
@@ -246,7 +236,6 @@ class Register extends React.Component{
              visible:false,
              visible2:false,
              confirmDirty: false,
-             autoCompleteResult: [],
          }
      }
     showModal = () => {
@@ -265,16 +254,22 @@ class Register extends React.Component{
           User.password=values.密码;
           User.bupt_id=values.学号;
           User.class_number=values.班级号;
-          if(User.usertype==="teacher"||User.usertype==="assistant"){
+          if(typeof(User.bupt_id)=="undefined"||User.bupt_id==''){
             delete User.bupt_id;
+          }
+          if(typeof(User.class_number)=="undefined"||User.class_number==''){
             delete User.class_number;
           }
           User.phone=values.手机号;
           User.email=values.邮箱;
-          enrollUser().catch(function(error){
+          var that=this;
+          enrollUser().then(function(response){
+            that.setState({visible:false,visible2:true,});
+          })
+          .catch(function(error){
+            message.error('用户创建失败!',3);
             console.log(error);
           });
-          this.setState({visible:false,visible2:true,});
         }
       });
       
@@ -398,7 +393,6 @@ class Register extends React.Component{
 
      render(){
          const { getFieldDecorator } = this.props.form;
-         const { autoCompleteResult } = this.state;
          const formItemLayout = {
            labelCol: {
              xs: { span: 24 },
@@ -485,7 +479,6 @@ class Register extends React.Component{
                 <RadioGroup onChange={this.checkStudent} >
                 <Radio value={"student"}>学生</Radio>
                 <Radio value={"teacher"}>老师</Radio>
-                <Radio value={"assistant"}>助教</Radio>
                 </RadioGroup>
             )}
             </FormItem>

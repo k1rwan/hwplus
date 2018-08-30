@@ -1,9 +1,9 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
 import './teacherindex.css';
-import {Modal,Button,Input,Tag,Icon,Layout,Menu,Breadcrumb,Avatar,Badge,Row,Col}from'antd';
+import {Button,Tag,Icon,Layout,Menu,Avatar,Badge,Row,Col}from'antd';
 import axios from 'axios';
-import {Route,Switch,Link,HashRouter,BrowserRouter,Redirect} from 'react-router-dom';
+import {Route,Switch,Redirect} from 'react-router-dom';
 import WrappedTeachercenter from './teachercenter.js';
 import Teacherclass from './teacherclass.js';
 import WrappedAddcourse from './teacheraddcourse.js'
@@ -24,7 +24,6 @@ class TeacherIndex extends React.Component{
         norepeatkey3:true,
         norepeatkey4:true,
         norepeatkey5:true,
-        norepeatkey5:true,
         norepeatkey6:true,
         clickmenu:true,//确保是在点击侧边菜单的操作
         bupt_id:"",
@@ -37,7 +36,8 @@ class TeacherIndex extends React.Component{
         username:"",
         usertype:"",
         wechat:"",
-        courselist:[],//教师的课程班信息，为一个数组，数组里面的每个元素均为单个课程班的信息
+        courselist:[],//教师作为教师的课程班信息，为一个数组，数组里面的每个元素均为单个课程班的信息
+        assistantcourselist:[],//教师作为助教参加的课程班信息，为一个数组，数组里面的每个元素均为单个课程班的信息
     }
  }
    
@@ -98,6 +98,7 @@ class TeacherIndex extends React.Component{
        console.log(error);
      })
      var lastUpdateteachercourse=[];
+     var lastUpdateassistantcourse=[];//教师作为助教参加的课程
      this.getCourse=setInterval(()=>{
      var getUserCourse=axios.create({
        url:"http://homeworkplus.cn/graphql/",
@@ -131,6 +132,30 @@ class TeacherIndex extends React.Component{
                  classNumber
                }
              }
+             teachingAssistantsCourse{
+              id
+              name
+              description
+              marks
+              school
+              startTime
+              endTime
+              teachers{
+                id
+                name
+              }
+              teachingAssistants{
+                id
+                name
+              }
+              students{
+                id
+                buptId
+                name
+                usertype
+                classNumber
+              }
+            }
            }
           }`
        },
@@ -142,6 +167,10 @@ class TeacherIndex extends React.Component{
          lastUpdateteachercourse=response.data.data.getUsersByIds[0].teachersCourse;
          that.setState({courselist:lastUpdateteachercourse})
        }
+       if(JSON.stringify(lastUpdateassistantcourse)!==JSON.stringify(response.data.data.getUsersByIds[0].teachingAssistantsCourse)){
+        lastUpdateassistantcourse=response.data.data.getUsersByIds[0].teachingAssistantsCourse;
+        that.setState({assistantcourselist:lastUpdateassistantcourse})
+      }
      })
      .catch(function(error){
        console.log(error);
@@ -261,6 +290,7 @@ class TeacherIndex extends React.Component{
                     userinformation={userinformation}
                     changeinformation={this.changeinformation}
                     courselist={this.state.courselist}
+                    assistantcourselist={this.state.assistantcourselist}
                     redirecttocourse={this.redirecttocourse}
                   />
                 )}/>
@@ -268,6 +298,7 @@ class TeacherIndex extends React.Component{
                   <Teacherclass {...props}
                     userinformation={userinformation}
                     courselist={this.state.courselist}
+                    assistantcourselist={this.state.assistantcourselist}
                     redirecttocourse2={this.redirecttocourse2}
                   /> 
                 )}/>
