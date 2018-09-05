@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 import base64
 import re
 
@@ -7,7 +8,7 @@ from itsdangerous import URLSafeTimedSerializer as utsr
 import project.settings as settings
 from project.settings import SECRET_KEY, FRONTEND_DOMAIN
 
-
+# 10分钟过期的token
 class ShortToken():
     def __init__(self, security_key):
         self.security_key = security_key
@@ -21,7 +22,7 @@ class ShortToken():
         serializer = utsr(self.security_key)
         return serializer.loads(token, salt=self.salt, max_age=expiration)
 
-
+# 24小时过期的token
 class Token():
     def __init__(self, security_key):
         self.security_key = security_key
@@ -35,7 +36,7 @@ class Token():
         serializer = utsr(self.security_key)
         return serializer.loads(token, salt=self.salt, max_age=expiration)
 
-
+# 注册邮件(url暂未定)
 def send(user):
     global FRONTEND_DOMAIN
     token_confirm = ShortToken(SECRET_KEY.encode())
@@ -47,7 +48,7 @@ def send(user):
                          ])
     send_mail('HomeworkPlus', message, 'liadrinz@163.com', [user.email])
 
-
+# 忘记密码邮件(url暂未定)
 def send_forget(user):
     global FRONTEND_DOMAIN
     token_confirm = ShortToken(SECRET_KEY.encode())

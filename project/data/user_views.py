@@ -1,4 +1,4 @@
-# Create your views here.
+# -*- coding: utf-8 -*-
 import re
 
 from itsdangerous import SignatureExpired
@@ -10,6 +10,8 @@ from data import encrypt, models, serializers
 from data.confirm import ShortToken, Token, send, send_forget
 from data.models import User
 from project.settings import API_AUTH_KEY, SECRET_KEY
+
+# RESTful API for User
 
 token = Token(SECRET_KEY.encode())
 short_token = ShortToken(SECRET_KEY.encode())

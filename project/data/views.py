@@ -1,4 +1,4 @@
-# Create your views here.
+# -*- coding: utf-8 -*-
 import re
 import qrcode
 from itsdangerous import SignatureExpired
@@ -10,6 +10,8 @@ from data import models, permissions, serializers
 from data.confirm import ShortToken, Token, send
 from data.models import User
 from project.settings import API_AUTH_KEY, SECRET_KEY, FRONTEND_DOMAIN, BACKEND_DOMIAN
+
+# 一些非REST的接口
 
 token = Token(SECRET_KEY.encode())
 short_token = ShortToken(SECRET_KEY.encode())

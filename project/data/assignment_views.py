@@ -2,6 +2,8 @@ from rest_framework import filters, generics
 
 from data import models, permissions, serializers
 
+# RESTful API for Assignment
+
 class HWFAssignmentListView(generics.ListCreateAPIView):
     queryset = models.HWFAssignment.objects.all()
     serializer_class = serializers.HWFAssignmentSerializer

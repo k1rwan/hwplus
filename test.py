@@ -3,17 +3,15 @@ urlprefix = "http://localhost:8000"
 gql_url = urlprefix + '/graphql/'
 
 gql = """query {
-        allCourses {
-            courseAssignments {
-                id
-            }
+        getUsersByUsernames(usernames:["liadrinz","dimpurr"]) {
+            buptId
         }
 }"""
 
 import requests
 
 headers = {
-    "token": "ImxpYWRyaW56Ig.DmGnrA.SOFm9tdX4CHunl27FfXbLp_q5UA"
+    "token": "ImxpYWRyaW56Ig.DmaOkw.7jPjxAriGiTdlyU979eh_x3B0t8"
 }
 
 data = {

@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 import graphene
 from django import http
 from graphene_django.types import DjangoObjectType
@@ -7,6 +8,8 @@ from data.safe_gql_view import BetterGraphQLView
 from data.user_views import token
 
 from data import encrypt
+
+# GraphQL Schema
 
 # hidden fields
 user_exclude_fields = ('password', 'is_staff', 'is_superuser', 'first_name', 'last_name')
@@ -323,6 +326,7 @@ class Query(object):
     all_users = graphene.List(UserType)
     get_users_by_ids = graphene.List(UserType, ids=graphene.List(of_type=graphene.Int))
     get_users_by_usertype = graphene.List(UserType, usertype=graphene.String())
+    get_users_by_usernames = graphene.List(UserType, usernames=graphene.List(of_type=graphene.String))
 
     all_courses = graphene.List(CourseType)
     get_courses_by_ids = graphene.List(CourseType, ids=graphene.List(of_type=graphene.Int))
@@ -346,6 +350,11 @@ class Query(object):
     def resolve_get_users_by_usertype(self, info, **kwargs):
         return models.User.objects.filter(usertype=kwargs['usertype'])
 
+    def resolve_get_users_by_usernames(self, info, **kwargs):
+        result = models.models.Q(username=None)
+        for item in kwargs['usernames']:
+            result = result | models.models.Q(username=item)
+        return models.User.objects.filter(result)
 
     # specific query of courses
     def resolve_all_courses(self, info, **kwargs):

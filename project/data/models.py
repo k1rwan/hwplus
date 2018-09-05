@@ -1,9 +1,8 @@
+# -*- coding: utf-8 -*-
 from django.contrib.auth.models import AbstractUser
 from django.db import models
 
-# from project.settings import MEDIA_ROOT
-
-
+# 为老师助教自动生成buptid
 def default_bupt_id():
     count = User.objects.all().count()
     return 'noBuptId'+str(count)
@@ -13,8 +12,7 @@ def default_phone():
     count = User.objects.all().count()
     return 'noPhone'+str(count)
 
-# User prototype
-
+# User Profile
 class User(AbstractUser):
     date_joined = models.DateTimeField(auto_now_add=True, null=True)
     bupt_id = models.CharField(
@@ -30,6 +28,7 @@ class User(AbstractUser):
     wechat = models.TextField(null=True)
     forgotten = models.BooleanField(default=False)
 
+# 头像
 class UserAvatar(models.Model):
     user = models.ManyToManyField(User,related_name='useravatar')
     url_height = models.PositiveIntegerField(default=75)
@@ -37,6 +36,7 @@ class UserAvatar(models.Model):
     useravatar = models.ImageField(
         upload_to="avatars", height_field='url_height', width_field='url_width', null=True)
 
+# 课程
 class HWFCourseClass(models.Model):
     name = models.TextField()
     description = models.TextField()
@@ -79,6 +79,7 @@ class HWFFile(models.Model):
         User, on_delete=models.PROTECT)
 
 
+# 一项作业
 class HWFAssignment(models.Model):
     course_class = models.ForeignKey(HWFCourseClass, on_delete=models.PROTECT, related_name='course_assignments')
     name = models.TextField()
@@ -98,6 +99,7 @@ class HWFSubmission(models.Model):
     description = models.TextField()
     score = models.FloatField()
 
+# 以下只建了表，暂未实现功能
 
 class HWFQuestion(models.Model):
     assignment = models.ForeignKey(HWFAssignment, on_delete=models.PROTECT)

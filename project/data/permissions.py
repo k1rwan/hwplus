@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 import re
 
 from itsdangerous import SignatureExpired
@@ -10,6 +11,7 @@ from data.user_views import token
 
 from data import encrypt
 
+# 对于REST的一些权限控制
 
 # basic class
 class SelfEditUserAppendUserRead(permissions.BasePermission):

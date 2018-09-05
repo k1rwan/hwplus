@@ -5,11 +5,7 @@ from data.models import User
 
 from data.encrypt import getHash
 
-# class HWFUserProfileSerializer(serializers.ModelSerializer):
-
-#     class Meta:
-#         model = models.HWFUserProfile
-
+# 序列器 ( REST 和 GraphQL 中都有用到 )
 
 class UserSerializer(serializers.ModelSerializer):
 
@@ -23,17 +19,17 @@ class UserSerializer(serializers.ModelSerializer):
     def create(self, validated_data):
         vd = validated_data
         print(vd)
-        username, password, email, phone, name, wechat, usertype, gender = vd['username'], vd[
-            'password'], vd['email'], vd['phone'], vd['name'], getHash(vd['wechat']), vd['usertype'], vd['gender']
+        username, password, email, phone, name, usertype, gender = vd['username'], vd[
+            'password'], vd['email'], vd['phone'], vd['name'], vd['usertype'], vd['gender']
         user = None
         try:
             bupt_id = vd['bupt_id']
             class_number = vd['class_number']
             user = User.objects.create(usertype=usertype, gender=gender, username=username, email=email,
-                                       bupt_id=bupt_id, phone=phone, class_number=class_number, name=name, wechat=wechat, is_active=False)
+                                       bupt_id=bupt_id, phone=phone, class_number=class_number, name=name, is_active=False)
         except KeyError:
             user = User.objects.create(usertype=usertype, gender=gender, username=username, email=email,
-                                       phone=phone, class_number="000", name=name, wechat=wechat, is_active=False)
+                                       phone=phone, class_number="000", name=name, is_active=False)
 
         user.set_password(password)
         user.save()

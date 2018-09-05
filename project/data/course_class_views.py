@@ -1,4 +1,4 @@
-# Create your views here.
+# -*- coding: utf-8 -*-
 from project.settings import FRONTEND_DOMAIN, BACKEND_DOMIAN
 from data.views import short_token,token
 from rest_framework import filters, generics, viewsets
@@ -8,6 +8,7 @@ import qrcode
 
 from data import models, permissions, serializers
 
+# RESTful API for HWFCourseClass
 
 class HWFCourseClassListView(generics.ListCreateAPIView):
 
