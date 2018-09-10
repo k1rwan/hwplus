@@ -320,6 +320,14 @@ class EditCourse(graphene.Mutation):
             return EditCourse(ok=True, course=editing_course)
 
 
+# arguments of creating an Assignment
+class AssignmentCreationInput(graphene.InputObjectType):
+    course_class_id = graphene.Int(required=True)
+    name = graphene.String(required=True)
+    description = graphene.String(required=True)
+    deadline = graphene.DateTime(required=True)
+    addfile = graphene.String(required=True)
+
 # query
 class Query(object):
 
