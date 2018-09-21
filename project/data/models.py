@@ -58,20 +58,9 @@ class HWFCourseClass(models.Model):
         return self.name
 
 
-
-class HWFSupportFileExtension(models.Model):
-    name = models.TextField()
-    extension_regex = models.TextField()
-
-    def __str__(self):
-        return self.name
-
-
 # Any uploaded file is a HWFFile
 # unique by hashcode
 class HWFFile(models.Model):
-    extension = models.ForeignKey(
-        HWFSupportFileExtension, on_delete=models.PROTECT)
     data = models.FileField(upload_to='file', null=True)
     # copyright user
     initial_upload_time = models.DateTimeField(auto_now_add=True)
@@ -84,7 +73,7 @@ class HWFAssignment(models.Model):
     course_class = models.ForeignKey(HWFCourseClass, on_delete=models.PROTECT, related_name='course_assignments')
     name = models.TextField()
     description = models.TextField()
-    addfile = models.ManyToManyField(HWFFile,related_name='assignment')
+    addfile = models.ManyToManyField(HWFFile, related_name='assignment', blank=True, null=True)
     deadline = models.DateTimeField()
 
     def __str__(self):
@@ -155,7 +144,6 @@ class HWFSelectQuestionChoice(models.Model):
 
 
 class HWFFileQuestion(HWFQuestion):
-    support_extensions = models.ManyToManyField(HWFSupportFileExtension)
     values = models.ManyToManyField(HWFFile)
 
 

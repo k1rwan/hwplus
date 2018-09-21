@@ -66,9 +66,9 @@ def bind_wechat(request):
     return Response(data={"qrcode":"http://"+BACKEND_DOMIAN+"/media/bind_qr/"+name+".jpg","vtk":name})
 
 class HWFFileViewSet(viewsets.ModelViewSet):
+    
     queryset = models.HWFFile.objects.all()
     serializer_class = serializers.HWFFileSerializer
-
 
 class HWFSubmissionViewSet(viewsets.ModelViewSet):
     queryset = models.HWFSubmission.objects.all()

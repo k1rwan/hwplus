@@ -87,6 +87,7 @@ class HWFCourseClassSerializer(serializers.ModelSerializer):
         fields = '__all__'
 
 class HWFAssignmentSerializer(serializers.ModelSerializer):
+    addfile_id = serializers.IntegerField(required=False)
     class Meta:
         model = models.HWFAssignment
         fields = '__all__'
@@ -97,16 +98,13 @@ class HWFCourseClassSerializerWithAssignments(serializers.ModelSerializer):
         model=models.HWFCourseClass
         fields = ('id','name', 'description', 'course_assignments')
 
-class HWFSupportFileExtensionSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = models.HWFSupportFileExtension
-        fields = '__all__'
-
 
 class HWFFileSerializer(serializers.ModelSerializer):
+
     class Meta:
         model = models.HWFFile
         fields = '__all__'
+        read_only_fields = ('initial_upload_time', 'initial_upload_user')
 
 
 class HWFSubmissionSerializer(serializers.ModelSerializer):
