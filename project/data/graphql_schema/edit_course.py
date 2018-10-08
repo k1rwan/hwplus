@@ -7,7 +7,7 @@ from data import encrypt
 from data.graphql_schema.types import CourseType
 from data.graphql_schema.inputs import CourseEditionInput
 
-forbidden_resp = http.HttpResponseForbidden('{"error": "forbidden"}',content_type="application/json")
+from data.graphql_schema import except_resp as Exresp
 
 # editing a course
 class EditCourse(graphene.Mutation):
@@ -20,6 +20,7 @@ class EditCourse(graphene.Mutation):
 
     def mutate(self, info, course_data):
 
+        # id validation
         try:
             realuser = token.confirm_validate_token(info.context.META['HTTP_TOKEN'])
             realuser = models.User.objects.get(username=realuser)
@@ -29,11 +30,20 @@ class EditCourse(graphene.Mutation):
                 realuser = models.User.objects.get(wechat=encrypt.getHash(info.context.META['HTTP_TOKEN']))
                 editing_course = models.HWFCourseClass.objects.get(pk=course_data['id'])
             except:
-                return forbidden_resp
+                return Exresp.forbidden_resp
 
+        # start end time validation
+        start_time = editing_course.start_time
+        end_time = editing_course.end_time
+        if start_time >= end_time or end_time <= datetime.now():
+            return Exresp.deadline_expired_resp
+
+        # usertype validation
         if len(editing_course.teachers.filter(pk=realuser.id)) == 0:
             if len(editing_course.teaching_assistants.filter(pk=realuser.id)) == 0:
-                return forbidden_resp
+                # neither assistant nor teacher
+                return Exresp.forbidden_resp
+            # is assistant
             else:
                 if 'description' in course_data:
                     editing_course.description = course_data['description']
@@ -50,6 +60,7 @@ class EditCourse(graphene.Mutation):
                     editing_course.end_time = course_data['end_time']
                 editing_course.save()
                 return EditCourse(ok=True, course=editing_course)
+        # is teacher
         else:
             if 'name' in course_data:
                 editing_course.name = course_data['name']
@@ -74,4 +85,3 @@ class EditCourse(graphene.Mutation):
                 editing_course.end_time = course_data['end_time']
             editing_course.save()
             return EditCourse(ok=True, course=editing_course)
-

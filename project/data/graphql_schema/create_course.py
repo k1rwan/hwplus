@@ -1,3 +1,5 @@
+from datetime import datetime
+
 import graphene
 from django import http
 
@@ -7,7 +9,7 @@ from data import encrypt
 from data.graphql_schema.types import CourseType
 from data.graphql_schema.inputs import CourseCreationInput
 
-forbidden_resp = http.HttpResponseForbidden('{"error": "forbidden"}',content_type="application/json")
+from data.graphql_schema import except_resp as Exresp
 
 # creating a course
 class CreateCourse(graphene.Mutation):
@@ -20,6 +22,7 @@ class CreateCourse(graphene.Mutation):
 
     def mutate(self, info, course_data):
         
+        # id validation
         try:
             realuser = token.confirm_validate_token(info.context.META['HTTP_TOKEN'])
             realuser = models.User.objects.get(username=realuser)
@@ -27,8 +30,15 @@ class CreateCourse(graphene.Mutation):
             try:
                 realuser = models.User.objects.get(wechat=encrypt.getHash(info.context.META['HTTP_TOKEN']))
             except:
-                return forbidden_resp
+                return Exresp.forbidden_resp
+
+        # start end time validation
+        start_time = course_data['start_time']
+        end_time = course_data['end_time']
+        if start_time >= end_time or end_time <= datetime.now():
+            return Exresp.deadline_expired_resp
         
+        # isteacher validation
         if realuser.usertype.lower() == 'teacher':
             serial = serializers.HWFCourseClassSerializer(data=course_data)
             if serial.is_valid():
@@ -36,5 +46,4 @@ class CreateCourse(graphene.Mutation):
                 new_course.teachers.add(realuser)
             return CreateCourse(ok=True, course=new_course)
         else:
-            return http.HttpResponseForbidden('{"error":"you are not a teacher"}', content_type="application/json")
-
+            return Exresp.not_teacher_resp

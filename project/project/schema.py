@@ -11,5 +11,6 @@ class Mutations(graphene.ObjectType):
     edit_course = data.schema.EditCourse.Field()
     create_assignment = data.schema.CreateAssignment.Field()
     edit_assignment = data.schema.EditAssignment.Field()
+    delete_assignment = data.schema.DeleteAssignment.Field()
 
 schema = graphene.Schema(query=Query, mutation=Mutations)

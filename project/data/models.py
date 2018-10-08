@@ -73,6 +73,8 @@ class HWFAssignment(models.Model):
     course_class = models.ForeignKey(HWFCourseClass, on_delete=models.PROTECT, related_name='course_assignments')
     name = models.TextField()
     description = models.TextField()
+    type = models.CharField(max_length=20, choices=[(item, item) for item in [
+                                'image', 'docs', 'vary']], default='all')
     addfile = models.ManyToManyField(HWFFile, related_name='assignment', blank=True, null=True)
     deadline = models.DateTimeField()
 
@@ -82,12 +84,23 @@ class HWFAssignment(models.Model):
 
 # submission to an assignment
 class HWFSubmission(models.Model):
+    image = models.ForeignKey(HWFFile, on_delete=models.PROTECT, null=True, related_name='image_submission')
+    addfile = models.ForeignKey(HWFFile, on_delete=models.PROTECT, null=True, related_name='addfile_submission')
     submit_time = models.DateTimeField()
-    assignment = models.ForeignKey(HWFAssignment, on_delete=models.PROTECT)
-    submitter = models.ForeignKey(User, on_delete=models.PROTECT)
+    assignment = models.ForeignKey(HWFAssignment, on_delete=models.PROTECT, related_name='assignment_submission')
+    submitter = models.ForeignKey(User, on_delete=models.PROTECT, related_name='my_submission')
     description = models.TextField()
-    score = models.FloatField()
+    score = models.FloatField(default=0.0)
 
+
+# message
+class Message(models.Model):
+    send_time = models.DateTimeField(auto_now_add=True)
+    sender = models.ForeignKey(User, on_delete=models.PROTECT, related_name="out_message")
+    receiver = models.ForeignKey(User, on_delete=models.PROTECT, related_name="in_message")
+    read = models.BooleanField(default=False)
+    content = models.TextField()
+    
 # 以下只建了表，暂未实现功能
 
 class HWFQuestion(models.Model):

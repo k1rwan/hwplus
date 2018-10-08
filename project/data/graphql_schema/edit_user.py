@@ -7,7 +7,7 @@ from data import encrypt
 from data.graphql_schema.types import UserType
 from data.graphql_schema.inputs import UserEditionInput
 
-forbidden_resp = http.HttpResponseForbidden('{"error": "forbidden"}',content_type="application/json")
+from data.graphql_schema import except_resp as Exresp
 
 # editing a user
 class EditUser(graphene.Mutation):
@@ -19,6 +19,8 @@ class EditUser(graphene.Mutation):
     user = graphene.Field(UserType)
 
     def mutate(self, info, user_data):
+
+        # id validation
         try:
             realuser = token.confirm_validate_token(info.context.META['HTTP_TOKEN'])
             realuser = models.User.objects.get(username=realuser)
@@ -28,7 +30,9 @@ class EditUser(graphene.Mutation):
                 realuser = models.User.objects.get(wechat=encrypt.getHash(info.context.META['HTTP_TOKEN']))
                 editing_user = models.User.objects.get(pk=user_data['id'])
             except:
-                return forbidden_resp
+                return Exresp.forbidden_resp
+        
+        # owner validation
         if editing_user.username == realuser.username:
             if 'username' in user_data:
                 editing_user.username = user_data['username']
@@ -40,4 +44,4 @@ class EditUser(graphene.Mutation):
             ok = True
             return EditUser(user=editing_user, ok=ok)
         else:
-            return forbidden_resp
+            return Exresp.forbidden_resp

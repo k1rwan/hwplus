@@ -1,3 +1,5 @@
+from datetime import datetime
+
 import graphene
 from django import http
 
@@ -7,8 +9,7 @@ from data import encrypt
 from data.graphql_schema.types import AssignmentType
 from data.graphql_schema.inputs import AssignmentCreationInput
 
-forbidden_resp = http.HttpResponseForbidden('{"error": "forbidden"}',content_type="application/json")
-
+from data.graphql_schema import except_resp as Exresp
 
 # creating an assignment
 class CreateAssignment(graphene.Mutation):
@@ -20,13 +21,8 @@ class CreateAssignment(graphene.Mutation):
     assignment = graphene.Field(AssignmentType)
 
     def mutate(self, info, assignment_data):
-
-        if settings.DEBUG == True:
-            serial = serializers.HWFAssignmentSerializer(data=assignment_data)
-            if serial.is_valid():
-                new_assignment = serial.save()
-            return CreateAssignment(ok=True, assignment=new_assignment)
-
+        
+        # id validation
         try:
             realuser = token.confirm_validate_token(info.context.META['HTTP_TOKEN'])
             realuser = models.User.objects.get(username=realuser)
@@ -34,12 +30,26 @@ class CreateAssignment(graphene.Mutation):
             try:
                 realuser = models.User.objects.get(wechat=encrypt.getHash(info.context.META['HTTP_TOKEN']))
             except:
-                return forbidden_resp
+                return Exresp.forbidden_resp
+        
+        # type validation
+        if assignment_data['type'] not in ('image', 'docs', 'all'):
+            return Exresp.invalid_type_resp
 
-        if realuser.usertype.lower() == 'teacher':
+        # time validation
+        if assignment_data['deadline'] < datetime.now():
+            return Exresp.invalid_type_resp
+
+        editing_course = models.HWFCourseClass.objects.get(pk=assignment_data['course_class'])
+
+        if datetime.now() > editing_course.end_time:
+            return Exresp.deadline_expired_resp
+
+        # isteacher or isassistant validation
+        if len(editing_course.teachers.filter(pk=realuser.id)) == 0 and len(editing_course.teaching_assistants.filter(pk=realuser.id)) == 0:
+            return Exresp.forbidden_resp
+        else:
             serial = serializers.HWFAssignmentSerializer(data=assignment_data)
             if serial.is_valid():
                 new_assignment = serial.save()
             return CreateAssignment(ok=True, assignment=new_assignment)
-        else:
-            return http.HttpResponseForbidden('{"error":"you are not a teacher"}', content_type="application/json")

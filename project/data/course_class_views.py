@@ -1,4 +1,5 @@
-# -*- coding: utf-8 -*-
+# Reserve in case
+
 from project.settings import FRONTEND_DOMAIN, BACKEND_DOMIAN
 from data.views import short_token,token
 from rest_framework import filters, generics, viewsets
