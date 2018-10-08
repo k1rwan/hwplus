@@ -24,7 +24,11 @@ class Query(object):
     get_assignments_by_deadline = graphene.List(AssignmentType, deadline=graphene.DateTime())
     search_assignments_by_name = graphene.List(AssignmentType, name=graphene.String())
     search_asssignments_by_keywords = graphene.List(AssignmentType, keywords=graphene.String())
-    
+
+    all_submissions = graphene.List(SubmissionType)
+    get_submissions_by_owners = graphene.List(SubmissionType, owners=graphene.List(of_type=graphene.Int))
+    get_submissions_by_assignments = graphene.List(SubmissionType, assignments=graphene.List(of_type=graphene.Int))
+    get_submissions_by_courses = graphene.List(SubmissionType, courses=graphene.List(of_type=graphene.Int))
 
     # query for users
     def resolve_all_users(self, info, **kwargs):
@@ -136,3 +140,28 @@ class Query(object):
                     if kwargs['keywords'] in teacher.name:
                         result = result | models.models.Q(pk=item.pk)
                         break
+
+    # specific query for submissions
+    def resolve_all_submissions(self, info, **kwargs):
+        return models.HWFSubmission.objects.all()
+
+    def resolve_get_submissions_by_owners(self, info, **kwargs):
+        result = models.models.Q(pk=None)
+        for submission in models.HWFSubmission.objects.all():
+            if submission.submitter.pk in kwargs['owners']:
+                result = result | models.models.Q(pk=submission.pk)
+        return models.HWFSubmission.objects.filter(result)
+
+    def resolve_get_submissions_by_assignments(self, info, **kwargs):
+        result = models.models.Q(pk=None)
+        for submission in models.HWFSubmission.objects.all():
+            if submission.assignment.pk in kwargs['assignments']:
+                result = result | models.models.Q(pk=submission.pk)
+        return models.HWFSubmission.objects.filter(result)
+
+    def resolve_get_submissions_by_courses(self, info, **kwargs):
+        result = models.models.Q(pk=None)
+        for submission in models.HWFSubmission.objects.all():
+            if submission.assignment.course_class.pk in kwargs['courses']:
+                result = result | models.models.Q(pk=submission.pk)
+        return models.HWFSubmission.objects.filter(result)

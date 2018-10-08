@@ -86,7 +86,7 @@ class HWFAssignment(models.Model):
 class HWFSubmission(models.Model):
     image = models.ForeignKey(HWFFile, on_delete=models.PROTECT, null=True, related_name='image_submission')
     addfile = models.ForeignKey(HWFFile, on_delete=models.PROTECT, null=True, related_name='addfile_submission')
-    submit_time = models.DateTimeField()
+    submit_time = models.DateTimeField(auto_now_add=True)
     assignment = models.ForeignKey(HWFAssignment, on_delete=models.PROTECT, related_name='assignment_submission')
     submitter = models.ForeignKey(User, on_delete=models.PROTECT, related_name='my_submission')
     description = models.TextField()

@@ -71,3 +71,19 @@ class AssignmentEditionInput(graphene.InputObjectType):
 # arguments of deleting an Assignment
 class AssignmentDeletionInput(graphene.InputObjectType):
     ids = graphene.List(of_type=graphene.Int, required=True)
+
+
+# arguments of creating an Submission
+class SubmissionCreationInput(graphene.InputObjectType):
+    image = graphene.Int(required=False)
+    addfile = graphene.Int(required=False)
+    assigment = graphene.Int(required=True)
+    submitter = graphene.Int(required=True)
+    description = graphene.String(required=False)
+
+
+# submission cannot be edited
+# arguments of giving score
+class ScoreGivingInput(graphene.InputObjectType):
+    submission = graphene.Int(required=True)
+    score = graphene.Float(required=True)

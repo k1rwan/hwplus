@@ -42,3 +42,8 @@ class CourseType(DjangoObjectType):
 class AssignmentType(DjangoObjectType):
     class Meta:
         model = models.HWFAssignment
+
+
+class SubmissionType(DjangoObjectType):
+    class Meta:
+        model = models.HWFSubmission
