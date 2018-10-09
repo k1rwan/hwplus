@@ -77,8 +77,7 @@ class AssignmentDeletionInput(graphene.InputObjectType):
 class SubmissionCreationInput(graphene.InputObjectType):
     image = graphene.Int(required=False)
     addfile = graphene.Int(required=False)
-    assigment = graphene.Int(required=True)
-    submitter = graphene.Int(required=True)
+    assignment = graphene.Int(required=True)
     description = graphene.String(required=False)
 
 

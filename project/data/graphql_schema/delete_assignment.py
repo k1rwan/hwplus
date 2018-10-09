@@ -39,7 +39,7 @@ class DeleteAssignment(graphene.Mutation):
             to_del = models.HWFAssignment.objects.get(pk=id)
 
             # deadline validation
-            if datetime.now() > to_del.deadline:
+            if datetime.now() > to_del.deadline.replace(tzinfo=None):
                 return Exresp.deadline_expired_resp
 
             # owner validation

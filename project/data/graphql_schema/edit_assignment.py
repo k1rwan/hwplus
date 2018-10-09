@@ -36,10 +36,10 @@ class EditAssignment(graphene.Mutation):
                 return Exresp.forbidden_resp
 
         # time validation
-        if datetime.now() > editing_assignment.deadline:
+        if datetime.now() > editing_assignment.deadline.replace(tzinfo=None):
             return Exresp.deadline_expired_resp
 
-        if datetime.now() > editing_assignment.course_class.end_time:
+        if datetime.now() > editing_assignment.course_class.end_time.replace(tzinfo=None):
             return Exresp.deadline_expired_resp
 
         # owner validation

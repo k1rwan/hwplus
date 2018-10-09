@@ -37,12 +37,12 @@ class CreateAssignment(graphene.Mutation):
             return Exresp.invalid_type_resp
 
         # time validation
-        if assignment_data['deadline'] < datetime.now():
+        if assignment_data['deadline'].replace(tzinfo=None) < datetime.now():
             return Exresp.invalid_type_resp
 
         editing_course = models.HWFCourseClass.objects.get(pk=assignment_data['course_class'])
 
-        if datetime.now() > editing_course.end_time:
+        if datetime.now() > editing_course.end_time.replace(tzinfo=None):
             return Exresp.deadline_expired_resp
 
         # isteacher or isassistant validation

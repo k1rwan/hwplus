@@ -89,7 +89,7 @@ class HWFSubmission(models.Model):
     submit_time = models.DateTimeField(auto_now_add=True)
     assignment = models.ForeignKey(HWFAssignment, on_delete=models.PROTECT, related_name='assignment_submission')
     submitter = models.ForeignKey(User, on_delete=models.PROTECT, related_name='my_submission')
-    description = models.TextField()
+    description = models.TextField(default='')
     score = models.FloatField(default=0.0)
 
 

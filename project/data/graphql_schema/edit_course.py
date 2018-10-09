@@ -35,7 +35,7 @@ class EditCourse(graphene.Mutation):
         # start end time validation
         start_time = editing_course.start_time
         end_time = editing_course.end_time
-        if start_time >= end_time or end_time <= datetime.now():
+        if start_time >= end_time or end_time.replace(tzinfo=None) <= datetime.now():
             return Exresp.deadline_expired_resp
 
         # usertype validation
