@@ -86,3 +86,4 @@ class SubmissionCreationInput(graphene.InputObjectType):
 class ScoreGivingInput(graphene.InputObjectType):
     submission = graphene.Int(required=True)
     score = graphene.Float(required=True)
+    is_excellent = graphene.Boolean(required=False)

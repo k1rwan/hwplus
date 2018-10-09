@@ -114,6 +114,7 @@ class HWFSubmissionSerializer(serializers.ModelSerializer):
     submitter_id = serializers.IntegerField(required=False)
     score = serializers.FloatField(required=False)
     description = serializers.CharField(required=False)
+    is_excellent = serializers.BooleanField(required=False)
     class Meta:
         model = models.HWFSubmission
         fields = '__all__'

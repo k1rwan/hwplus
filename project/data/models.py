@@ -91,6 +91,7 @@ class HWFSubmission(models.Model):
     submitter = models.ForeignKey(User, on_delete=models.PROTECT, related_name='my_submission')
     description = models.TextField(default='')
     score = models.FloatField(default=0.0)
+    is_excellent = models.BooleanField(default=False)
 
 
 # message
@@ -100,7 +101,7 @@ class Message(models.Model):
     receiver = models.ForeignKey(User, on_delete=models.PROTECT, related_name="in_message")
     read = models.BooleanField(default=False)
     content = models.TextField()
-    
+
 # 以下只建了表，暂未实现功能
 
 class HWFQuestion(models.Model):

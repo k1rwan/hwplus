@@ -69,11 +69,7 @@ class HWFFileViewSet(viewsets.ModelViewSet):
     
     queryset = models.HWFFile.objects.all()
     serializer_class = serializers.HWFFileSerializer
-
-class HWFSubmissionViewSet(viewsets.ModelViewSet):
-    queryset = models.HWFSubmission.objects.all()
-    serializer_class = serializers.HWFSubmissionSerializer
-
+    
 
 class HWFQuestionViewSet(viewsets.ModelViewSet):
     queryset = models.HWFQuestion.objects.all()
