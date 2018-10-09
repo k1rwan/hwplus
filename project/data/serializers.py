@@ -50,28 +50,28 @@ class UserSerializerCourse(UserSerializer):
         read_only_fields = ('id', 'username')
 
 
-class UserSerializerCourseForStudent(UserSerializerCourse):
+# class UserSerializerCourseForStudent(UserSerializerCourse):
 
-    class Meta:
-        model = User
-        fields = ('id', 'username', 'students_course')
-        read_only_fields = ('id', 'username')
-
-
-class UserSerializerCourseForTeacher(UserSerializerCourse):
-
-    class Meta:
-        model = User
-        fields = ('id', 'username', 'teachers_course')
-        read_only_fields = ('id', 'username')
+#     class Meta:
+#         model = User
+#         fields = ('id', 'username', 'students_course')
+#         read_only_fields = ('id', 'username')
 
 
-class UserSerializerCourseForAssistant(UserSerializerCourse):
+# class UserSerializerCourseForTeacher(UserSerializerCourse):
 
-    class Meta:
-        model = User
-        fields = ('id', 'username', 'teaching_assistants_course')
-        read_only_fields = ('id', 'username')
+#     class Meta:
+#         model = User
+#         fields = ('id', 'username', 'teachers_course')
+#         read_only_fields = ('id', 'username')
+
+
+# class UserSerializerCourseForAssistant(UserSerializerCourse):
+
+#     class Meta:
+#         model = User
+#         fields = ('id', 'username', 'teaching_assistants_course')
+#         read_only_fields = ('id', 'username')
 
 
 class UserAvatarSerializer(serializers.ModelSerializer):
@@ -81,22 +81,23 @@ class UserAvatarSerializer(serializers.ModelSerializer):
         fields = '__all__'
 
 class HWFCourseClassSerializer(serializers.ModelSerializer):
-
+    description = serializers.CharField(required=False)
     class Meta:
         model = models.HWFCourseClass
         fields = '__all__'
 
 class HWFAssignmentSerializer(serializers.ModelSerializer):
     addfile_id = serializers.IntegerField(required=False)
+    description = serializers.CharField(required=False)
     class Meta:
         model = models.HWFAssignment
         fields = '__all__'
 
-class HWFCourseClassSerializerWithAssignments(serializers.ModelSerializer):
+# class HWFCourseClassSerializerWithAssignments(serializers.ModelSerializer):
     
-    class Meta:
-        model = models.HWFCourseClass
-        fields = ('id','name', 'description', 'course_assignments')
+#     class Meta:
+#         model = models.HWFCourseClass
+#         fields = ('id','name', 'description', 'course_assignments')
 
 
 class HWFFileSerializer(serializers.ModelSerializer):

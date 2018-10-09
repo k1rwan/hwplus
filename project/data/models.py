@@ -39,7 +39,7 @@ class UserAvatar(models.Model):
 # 课程
 class HWFCourseClass(models.Model):
     name = models.TextField()
-    description = models.TextField()
+    description = models.TextField(default='')
     marks = models.FloatField(default=0.0)
     teachers = models.ManyToManyField(
         User, related_name='teachers_course', null=True, blank=True
@@ -72,7 +72,7 @@ class HWFFile(models.Model):
 class HWFAssignment(models.Model):
     course_class = models.ForeignKey(HWFCourseClass, on_delete=models.PROTECT, related_name='course_assignments')
     name = models.TextField()
-    description = models.TextField()
+    description = models.TextField(default='')
     type = models.CharField(max_length=20, choices=[(item, item) for item in [
                                 'image', 'docs', 'vary']], default='all')
     addfile = models.ManyToManyField(HWFFile, related_name='assignment', blank=True, null=True)

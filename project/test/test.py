@@ -10,12 +10,18 @@ gql = """
 mutation {
     createSubmission (
         submissionData: {
-            image: 1,
-            assignment: 6,
-            description: "卢姥爷，这是我的作业"
+            addfile: 1,
+            assignment: 7
         }
     ) {
         ok
+        submission {
+            id
+            submitter {
+                name
+                buptId
+            }
+        }
     }
 }
 """
