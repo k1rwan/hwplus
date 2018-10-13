@@ -27,13 +27,19 @@ def link(filename, keywords, content, offset, emsg):
     lines = getlines(filename)
     index = 0
     has = False
-    for i in range(0, len(lines)):
-        if keywords in lines[i]:
-            index = i
-            has = True
-            if keywords == 'import Query':
+    if keywords == '#':
+        for i in range(0, len(lines)):
+            if not re.match(r'\s*#\s*.*', lines[i]):
                 lines[i] = 'from data.%s.query import Query'%gqlpn
-            break
+                index = i
+                has = True
+                break
+    else:
+        for i in range(0, len(lines)):
+            if keywords in lines[i]:
+                index = i
+                has = True
+                break
     if not has:
         print(emsg)
         return False
@@ -90,7 +96,7 @@ if __name__ == '__main__':
 
     flush('./data/schema.py', 'import Query', None, mutations)
     flush('./project/schema.py', 'class Mutations', 'schema = graphene.Schema(query=Query, mutation=Mutations)', mutations)
-    link('./data/schema.py', 'import Query', '', 1, 'No valid Query found!')
+    link('./data/schema.py', '#', '', 1, 'No valid Query found!')
     for mutation in mutations:
 
         class_name = ''
@@ -120,5 +126,5 @@ if __name__ == '__main__':
         data_schema_import = 'from data.%s.mutations.%s import %s'%(gqlpn, origin_mutation, class_name)
         project_schema_register = '%s = data.schema.%s.Field()'%(mutation, class_name)
 
-        link('./data/schema.py', 'import Query', data_schema_import, 1, 'No valid Query found!')
+        link('./data/schema.py', '#', data_schema_import, 1, 'No valid Query found!')
         link('./project/schema.py', 'class Mutations', '    ' + project_schema_register, 1, 'No class Mutations found or legally named')
