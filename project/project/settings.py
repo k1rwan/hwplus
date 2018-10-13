@@ -193,3 +193,6 @@ CORS_EXPOSE_HEADERS=(
 
 FRONTEND_DOMAIN = "localhost:3000"
 BACKEND_DOMIAN = "homeworkplus.cn"
+
+# GraphQL path name
+GQL_PAHT_NAME = 'graphql_schema'
