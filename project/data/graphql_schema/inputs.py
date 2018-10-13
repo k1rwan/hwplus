@@ -81,7 +81,7 @@ class SubmissionCreationInput(graphene.InputObjectType):
     description = graphene.String(required=False)
 
 
-# submission cannot be edited
+# submission cannot be edited by student
 # arguments of giving score
 class ScoreGivingInput(graphene.InputObjectType):
     submission = graphene.Int(required=True)

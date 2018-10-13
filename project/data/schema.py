@@ -1,18 +1,3 @@
-# -*- coding: utf-8 -*-
-import graphene
-from django import http
-from graphene_django.types import DjangoObjectType
-
-from data import models, serializers
-from data.safe_gql_view import BetterGraphQLView
-from data.user_views import token
-
-from data import encrypt
-from project import settings
-
-from data.graphql_schema.types import *
-from data.graphql_schema.inputs import *
-
 from data.graphql_schema.query import Query
 
 from data.graphql_schema.create_user import CreateUser
