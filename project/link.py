@@ -30,7 +30,6 @@ def link(filename, keywords, content, offset, emsg):
     if keywords == '#':
         for i in range(0, len(lines)):
             if not re.match(r'\s*#\s*.*', lines[i]):
-                lines[i] = 'from data.%s.query import Query'%gqlpn
                 index = i
                 has = True
                 break
@@ -123,16 +122,17 @@ if __name__ == '__main__':
             print('Invalid Class')
             exit()
 
+        ancestor_mutation = mutation
         mutation = mutation.replace('.py', '')
         origin_mutation = mutation
         mutation = mutation[0].lower() + mutation[1:]
         
-        if mutation in queries:
+        if ancestor_mutation in queries:
             data_schema_import = 'from data.%s.queries.%s import %s'%(gqlpn, origin_mutation, class_name)
             project_schema_register = 'data.schema.%s'%class_name
             link('./data/schema.py', '#', data_schema_import, 1, 'No valid Query found!')
             link('./project/schema.py', 'class Query(', '    ' + project_schema_register + ', ', 1, '!')
-        elif mutation in mutations:
+        elif ancestor_mutation in mutations:
             data_schema_import = 'from data.%s.mutations.%s import %s'%(gqlpn, origin_mutation, class_name)
             project_schema_register = '%s = data.schema.%s.Field()'%(mutation, class_name)
             link('./data/schema.py', '#', data_schema_import, 1, 'No valid Query found!')

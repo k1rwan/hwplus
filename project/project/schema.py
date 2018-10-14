@@ -3,10 +3,10 @@ import graphene
 import data.schema
 
 class Query(
-    data.schema.QueryAssignment, 
-    data.schema.QueryCourse, 
-    data.schema.QuerySubmission, 
     data.schema.QueryUser, 
+    data.schema.QuerySubmission, 
+    data.schema.QueryCourse, 
+    data.schema.QueryAssignment, 
     graphene.ObjectType
     ):
     pass
