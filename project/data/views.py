@@ -22,10 +22,15 @@ short_token = ShortToken(SECRET_KEY.encode())
 # 获取课程的二维码
 @api_view(['POST'])
 def get_qrcode(request):
-    qr = qrcode.make("http://"+BACKEND_DOMIAN+"/data/courses/"+str(request.data['course_id']))
+    try:
+        realuser = token.confirm_validate_token(request.META['HTTP_TOKEN'])
+        new_token = short_token.generate_validate_token(realuser)
+    except:
+        return Response(data={"error": "forbidden"})
+    qr = qrcode.make("http://"+BACKEND_DOMIAN+"/data/courses/"+str(request.data['course_id'])+"?token="+new_token)
     name = short_token.generate_validate_token(str(request.data['course_id']))
     qr.save("./data/backend_media/invitation_qr/"+name+".jpg")
-    return Response(data={"qrcode":"http://"+BACKEND_DOMIAN+"/media/invitation_qr/"+name+".jpg","vtk":name})
+    return Response(data={"qrcode":"http://"+BACKEND_DOMIAN+"/media/invitation_qr/"+name+".jpg","vtk":new_token})
 
 
 # 获取绑定微信的二维码

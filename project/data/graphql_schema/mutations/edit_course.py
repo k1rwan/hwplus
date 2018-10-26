@@ -20,6 +20,7 @@ class EditCourse(graphene.Mutation):
 
     def mutate(self, info, course_data):
 
+        is_from_wechat = False
         # id validation
         try:
             realuser = token.confirm_validate_token(info.context.META['HTTP_TOKEN'])
@@ -29,6 +30,7 @@ class EditCourse(graphene.Mutation):
             try:
                 realuser = models.User.objects.get(wechat=encrypt.getHash(info.context.META['HTTP_TOKEN']))
                 editing_course = models.HWFCourseClass.objects.get(pk=course_data['id'])
+                is_from_wechat = True
             except:
                 return Exresp.forbidden_resp
 
@@ -39,7 +41,15 @@ class EditCourse(graphene.Mutation):
             return Exresp.deadline_expired_resp
 
         # usertype validation
-        if len(editing_course.teachers.filter(pk=realuser.id)) == 0:
+        if is_from_wechat:
+            if 'students' in course_data:
+                student_id = course_data['students'][0]
+                if student_id == realuser.pk:
+                    editing_course.students.add(models.User.objects.get(pk=student_id))
+                else:
+                    return Exresp.forbidden_resp
+
+        elif len(editing_course.teachers.filter(pk=realuser.id)) == 0:
             if len(editing_course.teaching_assistants.filter(pk=realuser.id)) == 0:
                 # neither assistant nor teacher
                 return Exresp.forbidden_resp
