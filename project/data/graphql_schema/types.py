@@ -10,6 +10,11 @@ class UserAvatarType(DjangoObjectType):
         model = models.UserAvatar
 
 
+class FileType(DjangoObjectType):
+    class Meta:
+        model = models.HWFFile
+        
+
 class UserType(DjangoObjectType):
     class Meta:
         model = models.User

@@ -1,4 +1,4 @@
-# ./project/schema.py
+# !!!!!!! Don't edit this file unless you're Liadrinz !!!!!!!
 import graphene
 import data.schema
 

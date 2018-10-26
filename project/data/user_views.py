@@ -11,10 +11,13 @@ from data.confirm import ShortToken, Token, send, send_forget
 from data.models import User
 from project.settings import API_AUTH_KEY, SECRET_KEY
 
-# RESTful API for User
-
+# 有效期为24小时的tokener
 token = Token(SECRET_KEY.encode())
+
+# 有效期为1小时的tokener
 short_token = ShortToken(SECRET_KEY.encode())
+
+# 登录时返回的状态
 results = {
     'SUCCESS': {
         'code': 1000,
@@ -37,7 +40,7 @@ results = {
 data = None
 headers = None
 
-
+# 重置数据
 def init():
     global data, headers
     data = {
@@ -77,6 +80,8 @@ def login(request):
 
     except:
         return Response(data=data, headers=headers)
+    
+    # username 字段可能是学号、手机、用户名和邮箱
     try:
         realuser = User.objects.get(bupt_id=from_username)
     except:
@@ -91,12 +96,13 @@ def login(request):
                 except:
                     return Response(data=data, headers=headers, status=status.HTTP_404_NOT_FOUND)
 
+    # 密码正确
     if realuser.check_password(from_password):
         if realuser.is_active == False:
             data['result'] = results['INACTIVE']
             return Response(data=data, headers=headers)
         serializer = serializers.UserSerializer(realuser)
-        validate_token = token.generate_validate_token(realuser.username)
+        validate_token = token.generate_validate_token(realuser.pk)
         headers['token'] = validate_token
         data['data'] = {key: serializer.data[key]
                         for key in serializer.data if key != 'password'}
@@ -108,7 +114,7 @@ def login(request):
 
     return Response(data=data, headers=headers, status=status.HTTP_400_BAD_REQUEST)
 
-
+# TODO: 确认前端未使用后删除
 @api_view(['GET', 'POST'])
 def user_list(request):
     init()
@@ -187,7 +193,7 @@ def user_list(request):
 
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
-
+# TODO: 确认前端未使用后删除
 @api_view(['GET', 'PUT'])
 def user_detail(request, pk):
     init()
@@ -257,15 +263,9 @@ def user_detail(request, pk):
                 return Response(data=data,headers=headers)
             else:
                 try:
-                    found_user = User.objects.get(bupt_id=plain)
+                    found_user = User.objects.get(pk=plain)
                 except:
-                    try:
-                        found_user = User.objects.get(phone=plain)
-                    except:
-                        try:
-                            found_user = User.objects.get(username=plain)
-                        except:
-                            return Response(data=data, headers=headers, status=status.HTTP_404_NOT_FOUND)
+                    return Response(data=data, headers=headers, status=status.HTTP_404_NOT_FOUND)
         except SignatureExpired as e:
             data['result'] = results['EXPIRED']
             headers['expired'] = True
@@ -302,9 +302,9 @@ def is_repeated(request):
 def activate(request):
     init()
     global data, headers, short_token
-    usrn = short_token.confirm_validate_token(request.META['HTTP_TOKEN'])
-    if usrn:
-        user_obj = User.objects.get(username=usrn)
+    userid = short_token.confirm_validate_token(request.META['HTTP_TOKEN'])
+    if userid:
+        user_obj = User.objects.get(pk=userid)
         user_obj.is_active = True
         user_obj.save()
         data['result'] = results['SUCCESS']
@@ -321,9 +321,9 @@ def change_password(request):
     init()
     global data, headers, token
     vtoken = request.META['HTTP_TOKEN']
-    username = token.confirm_validate_token(vtoken)
+    userid = token.confirm_validate_token(vtoken)
     try:
-        realuser = User.objects.get(username=username)
+        realuser = User.objects.get(pk=userid)
     except:
         return Response(data=data, headers=headers, status=status.HTTP_404_NOT_FOUND)
     if realuser.check_password(request.data['old_pass']):
@@ -345,7 +345,7 @@ def forget_password(request):
     requser = request.data['username']
     realuser = None
     try:
-        realuser = User.objects.get(username=requser)
+        realuser = User.objects.get(pk=requser)
     except:
         return Response(data=data, headers=headers, status=status.HTTP_404_NOT_FOUND)
 
@@ -360,9 +360,9 @@ def forget_password(request):
 def confirm_forgotten(request):
     init()
     global data, headers, short_token
-    usrn = short_token.confirm_validate_token(request.META['HTTP_TOKEN'])
-    if usrn:
-        user_obj = User.objects.get(username=usrn)
+    userid = short_token.confirm_validate_token(request.META['HTTP_TOKEN'])
+    if userid:
+        user_obj = User.objects.get(pk=userid)
         user_obj.forgotten = True
         user_obj.save()
         data['result'] = results['SUCCESS']
@@ -377,9 +377,9 @@ def confirm_forgotten(request):
 def directly_change(request):
     init()
     global data, headers, short_token
-    usrn = short_token.confirm_validate_token(request.META['HTTP_TOKEN'])
-    if usrn:
-        usrn_obj = User.objects.get(username=usrn)
+    userid = short_token.confirm_validate_token(request.META['HTTP_TOKEN'])
+    if userid:
+        usrn_obj = User.objects.get(pk=userid)
         if usrn_obj.forgotten:
             usrn_obj.set_password(request.data['new_pass'])
             usrn_obj.forgotten = False
@@ -397,7 +397,5 @@ class UserAvatarViewset(viewsets.ModelViewSet):
 
     def perform_create(self, serializer):
         vtk = self.request.headers['token']
-        username = token.confirm_validate_token(vtk)
-        user_obj = User.objects.get(username=username)
-        user_id = user_obj.pk
-        serializer.save(user = user_id)
+        userid = token.confirm_validate_token(vtk)
+        serializer.save(user = userid)

@@ -75,8 +75,8 @@ class AssignmentDeletionInput(graphene.InputObjectType):
 
 # arguments of creating an Submission
 class SubmissionCreationInput(graphene.InputObjectType):
-    image = graphene.Int(required=False)
-    addfile = graphene.Int(required=False)
+    image = graphene.List(of_type=graphene.Int, required=False)
+    addfile = graphene.List(of_type=graphene.Int, required=False)
     assignment = graphene.Int(required=True)
     description = graphene.String(required=False)
 

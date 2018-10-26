@@ -24,10 +24,10 @@ from data.safe_gql_view import BetterGraphQLView
 from django.views.static import serve
 from project import settings
 
+from data.views import echo_once
+
 urlpatterns = [
-    path('admin/', admin.site.urls),
-	url(r'^api-auth/', include('rest_framework.urls')),
-    url(r'^',include('data.urls')),
-    path('graphql/', BetterGraphQLView.as_view(graphiql=True, schema=schema)),
-    url(r'^media/(?P<path>.*)$', serve, {'document_root': settings.MEDIA_ROOT})
+    url(r'^',include('data.urls')), # restful and plain API
+    path('graphql/', BetterGraphQLView.as_view(graphiql=True, schema=schema)),  # GraphQL API
+    url(r'^media/(?P<path>.*)$', serve, {'document_root': settings.MEDIA_ROOT}) # File API
 ]

@@ -1,6 +1,8 @@
 # -*- coding: utf-8 -*-
 import re
+
 import qrcode
+from django.http import HttpResponse
 from itsdangerous import SignatureExpired
 from rest_framework import status, viewsets
 from rest_framework.decorators import api_view
@@ -9,48 +11,15 @@ from rest_framework.response import Response
 from data import models, permissions, serializers
 from data.confirm import ShortToken, Token, send
 from data.models import User
-from project.settings import API_AUTH_KEY, SECRET_KEY, FRONTEND_DOMAIN, BACKEND_DOMIAN
+from project.settings import (API_AUTH_KEY, BACKEND_DOMIAN, FRONTEND_DOMAIN, SECRET_KEY)
 
-# 一些非REST的接口
-
+# 有效期为24小时的tokener
 token = Token(SECRET_KEY.encode())
+# 有效期为1小时的tokener
 short_token = ShortToken(SECRET_KEY.encode())
-results = {
-    'SUCCESS': {
-        'code': 1000,
-        'msg': 'success'
-    },
-    'INACTIVE': {
-        'code': 4020,
-        'msg': '用户未激活'
-    },
-    'EXPIRED': {
-        'code': 4030,
-        'msg': '身份验证过期，请重新登录',
-    },
-    'PWD_ERR': {
-        'code': 4040,
-        'msg': '用户名或密码错误'
-    }
-}
-
-data = None
-headers = None
 
 
-def init():
-    global data, headers
-    data = {
-        'result': {
-            'code': None,
-            'msg': None
-        },
-        'data': None
-    }
-    headers = {
-        'token': None
-    }
-
+# 获取课程的二维码
 @api_view(['POST'])
 def get_qrcode(request):
     qr = qrcode.make("http://"+BACKEND_DOMIAN+"/data/courses/"+str(request.data['course_id']))
@@ -58,6 +27,8 @@ def get_qrcode(request):
     qr.save("./data/backend_media/invitation_qr/"+name+".jpg")
     return Response(data={"qrcode":"http://"+BACKEND_DOMIAN+"/media/invitation_qr/"+name+".jpg","vtk":name})
 
+
+# 获取绑定微信的二维码
 @api_view(['POST'])
 def bind_wechat(request):
     qr = qrcode.make("http://"+BACKEND_DOMIAN+"data/users/"+str(request.data['user_id']))
@@ -65,11 +36,26 @@ def bind_wechat(request):
     qr.save("./data/backend_media/bind_qr/"+name+".jpg")
     return Response(data={"qrcode":"http://"+BACKEND_DOMIAN+"/media/bind_qr/"+name+".jpg","vtk":name})
 
+
+# 上传文件(单独的文件)的接口
+@api_view(['POST'])
+def upload_file(request):
+    file = request.FILES.get('data', None)
+    tk = request.META['HTTP_TOKEN']
+    realuser = token.confirm_validate_token(tk)
+    upload_user_id = realuser
+    newfile = models.HWFFile.objects.create(data=file, initial_upload_user_id=upload_user_id)
+    return Response(data={"id": newfile.pk})
+
+
+# 文件(数据库文件对象HWFFile)的REST接口
 class HWFFileViewSet(viewsets.ModelViewSet):
     
     queryset = models.HWFFile.objects.all()
     serializer_class = serializers.HWFFileSerializer
     
+
+"""TODO: 以下接口待删除"""
 
 class HWFQuestionViewSet(viewsets.ModelViewSet):
     queryset = models.HWFQuestion.objects.all()

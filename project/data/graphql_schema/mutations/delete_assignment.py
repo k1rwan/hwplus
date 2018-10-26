@@ -25,7 +25,7 @@ class DeleteAssignment(graphene.Mutation):
         # id validation
         try:
             realuser = token.confirm_validate_token(info.context.META['HTTP_TOKEN'])
-            realuser = models.User.objects.get(username=realuser)
+            realuser = models.User.objects.get(pk=realuser)
         except:
             try:
                 realuser = models.User.objects.get(wechat=encrypt.getHash(info.context.META['HTTP_TOKEN']))

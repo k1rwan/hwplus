@@ -42,13 +42,13 @@ class HWFCourseClass(models.Model):
     description = models.TextField(default='')
     marks = models.FloatField(default=0.0)
     teachers = models.ManyToManyField(
-        User, related_name='teachers_course', null=True, blank=True
+        User, related_name='teachers_course', blank=True
         )
     teaching_assistants = models.ManyToManyField(
-        User, related_name='teaching_assistants_course', null=True, blank=True
+        User, related_name='teaching_assistants_course', blank=True
         )
     students = models.ManyToManyField(
-        User, related_name='students_course', null=True, blank=True
+        User, related_name='students_course', blank=True
         )
     school = models.TextField(null=True,blank=True)
     start_time = models.DateTimeField(null=True, blank=True)
@@ -61,7 +61,7 @@ class HWFCourseClass(models.Model):
 # Any uploaded file is a HWFFile
 # unique by hashcode
 class HWFFile(models.Model):
-    data = models.FileField(upload_to='file', null=True)
+    data = models.FileField(upload_to='homework_file', null=True)
     # copyright user
     initial_upload_time = models.DateTimeField(auto_now_add=True)
     initial_upload_user = models.ForeignKey(
@@ -75,7 +75,7 @@ class HWFAssignment(models.Model):
     description = models.TextField(default='')
     type = models.CharField(max_length=20, choices=[(item, item) for item in [
                                 'image', 'docs', 'vary']], default='all')
-    addfile = models.ManyToManyField(HWFFile, related_name='assignment', blank=True, null=True)
+    addfile = models.ManyToManyField(HWFFile, related_name='assignment', blank=True)
     deadline = models.DateTimeField()
 
     def __str__(self):
@@ -84,8 +84,10 @@ class HWFAssignment(models.Model):
 
 # submission to an assignment
 class HWFSubmission(models.Model):
-    image = models.ForeignKey(HWFFile, on_delete=models.PROTECT, null=True, related_name='image_submission')
-    addfile = models.ForeignKey(HWFFile, on_delete=models.PROTECT, null=True, related_name='addfile_submission')
+    aware = models.BooleanField(default=True)
+    image = models.ManyToManyField(HWFFile, blank=True, related_name='image_submission')
+    pdf = models.ForeignKey(HWFFile, on_delete=models.CASCADE, related_name='pdf_submission', null=True)
+    addfile = models.ManyToManyField(HWFFile, blank=True, related_name='addfile_submission')
     submit_time = models.DateTimeField(auto_now_add=True)
     assignment = models.ForeignKey(HWFAssignment, on_delete=models.PROTECT, related_name='assignment_submission')
     submitter = models.ForeignKey(User, on_delete=models.PROTECT, related_name='my_submission')

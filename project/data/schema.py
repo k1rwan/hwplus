@@ -1,4 +1,4 @@
-# ./data/schema.py
+# !!!!!!! Don't edit this file unless you're Liadrinz !!!!!!!
 
 from data.graphql_schema.mutations.give_score import GiveScore
 from data.graphql_schema.mutations.edit_user import EditUser
