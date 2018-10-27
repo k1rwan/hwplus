@@ -74,7 +74,7 @@ class Teacherclass extends React.Component{
             style={{marginLeft:"20px",marginRight:"20px",marginBottom:"20px"}}
             hoverable="true">
             <Card.Grid style={gridStyle2}>
-            <Link to={'/teachercenter/class/'+this.props.courselist[i]["id"]+'/'} 
+            <Link to={'/teachercenter/teacherclass/'+this.props.courselist[i]["id"]+'/'} 
                   style={{color:"black"}}
                   onClick={this.props.redirecttocourse2}
             > 

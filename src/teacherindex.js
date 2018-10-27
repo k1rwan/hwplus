@@ -7,6 +7,7 @@ import {Route,Switch,Redirect} from 'react-router-dom';
 import WrappedTeachercenter from './teachercenter.js';
 import Teacherclass from './teacherclass.js';
 import WrappedAddcourse from './teacheraddcourse.js'
+import TeacherSpecificClass from './teacherSpecificClass.js';
 import {_} from 'underscore'
 
 //大多数的地方使用graphql技术获取和传送数据
@@ -300,6 +301,12 @@ class TeacherIndex extends React.Component{
                     courselist={this.state.courselist}
                     assistantcourselist={this.state.assistantcourselist}
                     redirecttocourse2={this.redirecttocourse2}
+                  /> 
+                )}/>
+                <Route exact path='/teachercenter/teacherclass/:courseID' render={(props)=>(
+                  <TeacherSpecificClass {...props}
+                    userinformation={userinformation}
+                    courselist={this.state.courselist}
                   /> 
                 )}/>
                 <Route exact path='/teachercenter/createclass' render={(props)=>(
